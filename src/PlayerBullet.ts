@@ -22,6 +22,14 @@ export class PlayerBulletGroup extends Phaser.Physics.Arcade.Group
             bullet.fire(x, y);
         }
     }
+
+    stop() {
+        // this.timedEvent.remove();
+
+        this.getChildren().forEach((child) => {
+            (child as PlayerBullet).kill();
+        });
+    }
 }
 
 export class PlayerBullet extends Phaser.Physics.Arcade.Sprite

@@ -3,7 +3,7 @@ const path = require("path");
 module.exports = {
     entry: {
         // this is our entry point, the main TypeScript file
-        app: "./src/main.ts",
+        app: "./src/Main.ts",
     },
     output: {
         // this is our output file, the one which bundles all libraries

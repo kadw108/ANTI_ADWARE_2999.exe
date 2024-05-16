@@ -1,17 +1,25 @@
 import GameMain from "./Game";
 
-export default class Player extends Phaser.Physics.Arcade.Sprite
-{
+const SHOOT_COOLDOWN: number = 500;
+const HIT_COOLDOWN: number = 700;
+const SPEED: number = 160;
+
+export default class Player extends Phaser.Physics.Arcade.Sprite {
     scene: GameMain;
 
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
     spacebar: Phaser.Input.Keyboard.Key;
-    physicsBody: Phaser.Physics.Arcade.Body;
+    dynamicBody: Phaser.Physics.Arcade.Body;
 
     canShoot: boolean;
 
-    constructor (scene: GameMain)
-    {
+    canBeHit: boolean;
+    currentHP: number;
+    maxHP: number;
+
+    isAlive: boolean;
+
+    constructor(scene: GameMain) {
         super(scene, 450, 550, "circle");
         this.scale = 0.4;
 
@@ -19,7 +27,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
 
         scene.add.existing(this);
         scene.physics.add.existing(this);
-        this.physicsBody = this.body as Phaser.Physics.Arcade.Body;
+        this.dynamicBody = this.body as Phaser.Physics.Arcade.Body;
         this.setCollideWorldBounds(true, 0, 0);
         this.setImmovable(true);
 
@@ -28,75 +36,81 @@ export default class Player extends Phaser.Physics.Arcade.Sprite
 
         this.canShoot = true;
 
-        /*
-        this.isAlive = true;
-        this.isThrowing = false;
+        this.canBeHit = true;
+        this.maxHP = 3;
+        this.currentHP = this.maxHP;
 
-        this.sound = scene.sound;
-        this.currentTrack = track;
-
-        this.spacebar = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-        this.up = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-        this.down = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-
-        this.play('idle');
-        */
+        this.isAlive = false;
     }
 
-    start ()
-    {
-        this.canShoot = true;
-        /*
+    start() {
         this.isAlive = true;
-        this.isThrowing = false;
-
-        this.currentTrack = this.scene.tracks[0];
-        this.y = this.currentTrack.y;
-    
-        this.on('animationcomplete-throwStart', this.releaseSnowball, this);
-        this.on('animationcomplete-throwEnd', this.throwComplete, this);
-
-        this.play('idle', true);
-        */
     }
 
     moveHorizontal() {
         if (this.cursors.left.isDown) {
-            this.physicsBody!.setVelocityX(-160);
+            this.dynamicBody!.setVelocityX(-SPEED);
         } else if (this.cursors.right.isDown) {
-            this.physicsBody!.setVelocityX(160);
+            this.dynamicBody!.setVelocityX(SPEED);
         } else {
-            this.physicsBody!.setVelocityX(0);
+            this.dynamicBody!.setVelocityX(0);
         }
     }
 
     moveVertical() {
         if (this.cursors.up.isDown) {
-            this.physicsBody!.setVelocityY(-160);
+            this.dynamicBody!.setVelocityY(-SPEED);
         } else if (this.cursors.down.isDown) {
-            this.physicsBody.setVelocityY(160);
+            this.dynamicBody.setVelocityY(SPEED);
         } else {
-            this.physicsBody.setVelocityY(0);
+            this.dynamicBody.setVelocityY(0);
         }
     }
 
     fire() {
         // if (this.cursors.space.isDown && this.canShoot) {
-         if (this.cursors.space.isDown && this.canShoot) {
+        if (this.cursors.space.isDown && this.canShoot) {
             this.canShoot = false;
 
             this.scene.playerBulletGroup.fireBullet(this.x, this.y);
 
-            this.scene.time.delayedCall(300, () => {
+            this.scene.time.delayedCall(SHOOT_COOLDOWN, () => {
                 this.canShoot = true;
-              });
+            });
         }
     }
 
     update() {
-        this.moveHorizontal();
-        this.moveVertical();
-        this.fire();
+        if (this.isAlive) {
+            this.moveHorizontal();
+            this.moveVertical();
+            this.fire();
+        }
     }
 
+    hit() {
+        if (this.canBeHit) {
+            this.canBeHit = false;
+
+            this.setTintFill(0xff0000);
+            this.scene.sound.play("popupBlocked");
+
+            this.currentHP--;
+            this.scene.hpText.text = "HP: " + this.currentHP + "/" + this.maxHP;
+
+            if (this.currentHP <= 0) {
+                this.scene.gameOver();
+            }
+
+            this.scene.time.delayedCall(HIT_COOLDOWN, () => {
+                this.clearTint();
+                this.canBeHit = true;
+            });
+        }
+    }
+
+    die() {
+        this.isAlive = false;
+        this.dynamicBody.stop;
+    }
 }

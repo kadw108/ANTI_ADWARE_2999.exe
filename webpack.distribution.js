@@ -8,7 +8,7 @@ module.exports = {
     entry: {
  
         // this is our entry point, the main TypeScript file
-        app: './src/main.ts',
+        app: './src/Main.ts',
     },
     output: {
  

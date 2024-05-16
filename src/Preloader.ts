@@ -148,6 +148,6 @@ export default class Preloader extends Phaser.Scene
         rectangle.isStroked = true;
         rectangle.strokeColor = 0x00ffff;
 
-        this.scene.start("GameMain");
+        this.scene.start("Menu");
     }
 }

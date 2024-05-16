@@ -9,9 +9,9 @@ type ReleaseEvent = {
 };
 
 type EnemyType = {
-    width: number,
-    height: number,
-    hp: number
+    width: number;
+    height: number;
+    hp: number;
 };
 
 export class EnemyGroup extends Phaser.Physics.Arcade.Group {
@@ -27,9 +27,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             { x: 500, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 3000, type: 0 },
             { x: 500, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 4000, type: 0 },
         ];
-        this.typeList = [
-            {width: 200, height: 75, hp: 1}
-        ];
+        this.typeList = [{ width: 200, height: 75, hp: 2 }];
     }
 
     start() {
@@ -44,7 +42,6 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     }
 
     release(x: number, y: number, velocity: Phaser.Math.Vector2, enemyType: EnemyType) {
-
         let newEnemy: Enemy;
         this.getChildren().forEach((child) => {
             if (!child.active && (child as Enemy).enemyType === enemyType) {
@@ -65,19 +62,21 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
         // this.timedEvent.remove();
 
         this.getChildren().forEach((child) => {
-            (child as Enemy).stop();
+            (child as Enemy).kill();
         });
     }
 }
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
-    scene: GameMain
+    scene: GameMain;
 
     dynamicBody: Phaser.Physics.Arcade.Body;
     onWorldBounds: Function;
 
     currentHp: number;
     enemyType: EnemyType;
+
+    hitNum: number;
 
     constructor(scene: GameMain, type: EnemyType) {
         super(scene, 0, 0, "squareSmall");
@@ -100,6 +99,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
         };
 
         scene.add.existing(this);
+
+        this.hitNum = 0;
     }
 
     start(x: number, y: number, velocity: Phaser.Math.Vector2) {
@@ -120,9 +121,19 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     }
 
     hit() {
-        this.scene.sound.play('popupBlocked');
+        this.scene.sound.play("popupBlocked");
         this.currentHp -= 1;
-        
+
+        this.setTintFill(0xff0000);
+        this.hitNum++;
+        this.scene.time.delayedCall(300, () => {
+            this.hitNum--;
+            if (this.hitNum === 0) 
+            {
+                this.clearTint();
+            }
+        });
+
         if (this.currentHp <= 0) {
             this.kill();
         }
