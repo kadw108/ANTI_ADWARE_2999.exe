@@ -23,40 +23,41 @@ type EnemyType = {
 };
 
 /*
-TODO - 
-add hue rotate to enemies (optional?)
-create dynamic text enemies
-
-make undertale's blue and orange thingies (or just orange to start with)
-but you'll have to do something besides color I think... maybe wavy lines...?
-*/
-
-/*
-Function that turns a ReleaseEvent for one word/phrase into 
+Function that turns ReleaseEvents, each for a single word/phrase, into 
 individual letter enemies.
 */
-function generateLetterText(releaseEvent: ReleaseEvent) {
-    if (releaseEvent.textConfig === undefined) {
-        console.error("generateLetterText running on event with undefined textConfig");
-        return;
+function generateLetterText(releaseEvents: Array<ReleaseEvent>): undefined | Array<ReleaseEvent> {
+    const results = [];
+
+    for (const releaseEvent of releaseEvents) {
+        if (releaseEvent.textConfig === undefined) {
+            console.error("generateLetterText running on event with undefined textConfig");
+            return undefined;
+        }
+        if (releaseEvent.type !== "word") {
+            console.log('Advise: run generateLetterText only on events with "word" type enemies.');
+        }
+
+        const FONTWIDTH = 29; // 29 is obtained from the 'xadvance' property in the bitmap xml file
+
+        // 29 is for a 72 height font; must adjust width for variable fontsizes
+        const sizeAdjustedWidth = FONTWIDTH * (releaseEvent.textConfig.fontSize / 72);
+
+        const real_starting_x = releaseEvent.x - (sizeAdjustedWidth * releaseEvent.textConfig.text.length) / 2;
+
+        for (let i = 0; i < releaseEvent.textConfig.text.length; i++) {
+            let newRelease: ReleaseEvent = {
+                x: real_starting_x + i * sizeAdjustedWidth,
+                y: releaseEvent.y,
+                velocity: releaseEvent.velocity,
+                time: releaseEvent.time,
+                type: "letter",
+                textConfig: { text: releaseEvent.textConfig.text[i], fontSize: releaseEvent.textConfig.fontSize },
+            };
+            results.push(newRelease);
+        }
     }
 
-    const FONTWIDTH = 29; // 29 is obtained from the 'xadvance' property in the bitmap xml file
-    const real_starting_x = releaseEvent.x - (29 * (releaseEvent.textConfig.text.length) / 2);
-
-    const results = [];
-    for (let i = 0; i < releaseEvent.textConfig.text.length; i++) {
-        let newRelease: ReleaseEvent = {
-            x: real_starting_x + i * FONTWIDTH,
-            y: releaseEvent.y,
-            velocity: releaseEvent.velocity,
-            time: releaseEvent.time,
-            type: releaseEvent.type,
-            textConfig: {text: releaseEvent.textConfig.text[i], fontSize: releaseEvent.textConfig.fontSize}
-        };
-        results.push(newRelease);
-    };
-   
     return results;
 }
 
@@ -67,24 +68,29 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     constructor(scene: GameMain) {
         super(scene.physics.world, scene);
 
+        this.typeList = {
+            "0": { width: 200, height: 75, hp: 2 }, // 0
+            "1": { width: 50, height: 50, hp: 1 }, // 1
+            "2": { width: 18, height: 18, hp: 1 }, // 2
+            "3": { width: CONSTANTS.width, height: 2, hp: 1 }, // 3
+            word: { width: -1, height: -1, hp: 4, text: true },
+            letter: { width: -1, height: -1, hp: 1, text: true },
+        };
+
         /* this.config = [
             { x: 400, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 1000, type: 0 },
             { x: 400, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 2000, type: 0 },
             { x: 500, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 3000, type: 0 },
             { x: 500, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 4000, type: 0 },
         ]; */
-        const buy1 = generateLetterText(
-            { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 1000, type: "5", textConfig: { text: "BUY 1 GET 1 FREE", fontSize: 72 } });
-        this.config = [...buy1!];
+        const letters = generateLetterText([
+            { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 500, type: "word", textConfig: { text: "GET READY", fontSize: 72 } },
+            { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 1500, type: "word", textConfig: { text: "YOU DON'T WANT TO MISS THIS", fontSize: 72 } },
+            { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 2500, type: "word", textConfig: { text: "BEST DEALS OF YOUR LIFE!", fontSize: 72 } },
+            { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 3500, type: "word", textConfig: { text: "AND... GO!", fontSize: 100 } }
+        ]);
 
-        this.typeList = {
-            "0": { width: 200, height: 75, hp: 2 }, // 0
-            "1": { width: 50, height: 50, hp: 1 }, // 1
-            "2": { width: 18, height: 18, hp: 1 }, // 2
-            "3": { width: CONSTANTS.width, height: 2, hp: 1 }, // 3
-            "4": { width: -1, height: -1, hp: 4, text: true },
-            "5": { width: -1, height: -1, hp: 1, text: true },
-        };
+        this.config = [...letters!];
 
         for (let i = 0; i < 30; i++) {
             this.config.push({ x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 720 * i, type: "3" });
@@ -123,8 +129,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             }
 
             newEnemy.start(x, y, velocity);
-        }
-        else {
+        } else {
             if (textConfig === undefined) {
                 console.error("Text config is undefined for text enemy!");
                 return;
@@ -132,13 +137,15 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
 
             let newEnemy: TextEnemy;
 
-            if (enemyTypeKey === "5") {
+            if (enemyTypeKey === "letter") {
                 this.getChildren().forEach((child) => {
                     if (!child.active && (child as Enemy).enemyType === enemyType && (child as LetterEnemy).character === textConfig.text) {
                         //  We found a dead matching enemy, so resurrect it
-                        newEnemy = child as TextEnemy;
+                        newEnemy = child as LetterEnemy;
 
                         console.log("letter enemy resurrected");
+
+                        (newEnemy as LetterEnemy).restart(x, y, velocity, textConfig.fontSize);
                     }
                 });
             }
@@ -146,9 +153,8 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             if (newEnemy === undefined) {
                 newEnemy = new TextEnemy(this.scene as GameMain, enemyType, textConfig);
                 this.add(newEnemy);
+                newEnemy.start(x, y, velocity);
             }
-
-            newEnemy.start(x, y, velocity);
         }
     }
 
@@ -234,11 +240,9 @@ export class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
     clearHit() {
         this.clearTint();
     }
-
 }
 
 class Enemy extends EnemyAbstract {
-
     constructor(scene: GameMain, type: EnemyType) {
         super(scene, type);
 
@@ -296,6 +300,14 @@ class LetterEnemy extends TextEnemy {
             console.error("Character length of LetterEnemy is not 1!");
             console.error(textConfig);
         }
+    }
+
+    restart(x: number, y: number, velocity: Phaser.Math.Vector2, fontSize: number) {
+        super.start(x, y, velocity);
+
+        this.bitmapText.setFontSize(fontSize);
+        this.scaleX = this.bitmapText.width;
+        this.scaleY = this.bitmapText.height;
     }
 
     kill() {
