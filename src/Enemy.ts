@@ -31,6 +31,35 @@ make undertale's blue and orange thingies (or just orange to start with)
 but you'll have to do something besides color I think... maybe wavy lines...?
 */
 
+/*
+Function that turns a ReleaseEvent for one word/phrase into 
+individual letter enemies.
+*/
+function generateLetterText(releaseEvent: ReleaseEvent) {
+    if (releaseEvent.textConfig === undefined) {
+        console.error("generateLetterText running on event with undefined textConfig");
+        return;
+    }
+
+    const FONTWIDTH = 29; // 29 is obtained from the 'xadvance' property in the bitmap xml file
+    const real_starting_x = releaseEvent.x - (29 * (releaseEvent.textConfig.text.length) / 2);
+
+    const results = [];
+    for (let i = 0; i < releaseEvent.textConfig.text.length; i++) {
+        let newRelease: ReleaseEvent = {
+            x: real_starting_x + i * FONTWIDTH,
+            y: releaseEvent.y,
+            velocity: releaseEvent.velocity,
+            time: releaseEvent.time,
+            type: releaseEvent.type,
+            textConfig: {text: releaseEvent.textConfig.text[i], fontSize: releaseEvent.textConfig.fontSize}
+        };
+        results.push(newRelease);
+    };
+   
+    return results;
+}
+
 export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     config: Array<ReleaseEvent>;
     typeList: { [id: string]: EnemyType };
@@ -44,14 +73,17 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             { x: 500, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 3000, type: 0 },
             { x: 500, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 4000, type: 0 },
         ]; */
-        this.config = [{ x: 400, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 1000, type: "4", textConfig: { text: "WEARY WILLOW", fontSize: 72 } }];
+        const buy1 = generateLetterText(
+            { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 1000, type: "5", textConfig: { text: "BUY 1 GET 1 FREE", fontSize: 72 } });
+        this.config = [...buy1!];
 
         this.typeList = {
             "0": { width: 200, height: 75, hp: 2 }, // 0
             "1": { width: 50, height: 50, hp: 1 }, // 1
             "2": { width: 18, height: 18, hp: 1 }, // 2
             "3": { width: CONSTANTS.width, height: 2, hp: 1 }, // 3
-            "4": { width: -1, height: -1, hp: 1, text: true },
+            "4": { width: -1, height: -1, hp: 4, text: true },
+            "5": { width: -1, height: -1, hp: 1, text: true },
         };
 
         for (let i = 0; i < 30; i++) {
@@ -64,27 +96,32 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             this.scene.time.addEvent({
                 delay: releaseEvent.time,
                 callback: () => {
-                    this.release(releaseEvent.x, releaseEvent.y, releaseEvent.velocity, this.typeList[releaseEvent.type], releaseEvent.textConfig);
+                    this.release(releaseEvent.x, releaseEvent.y, releaseEvent.velocity, releaseEvent.type, releaseEvent.textConfig);
                 },
             });
         }
     }
 
-    release(x: number, y: number, velocity: Phaser.Math.Vector2, enemyType: EnemyType, textConfig: TextConfig | undefined) {
+    release(x: number, y: number, velocity: Phaser.Math.Vector2, enemyTypeKey: string, textConfig: TextConfig | undefined) {
+        const enemyType = this.typeList[enemyTypeKey];
+
         if (enemyType.text === undefined) {
             let newEnemy: Enemy;
+
             this.getChildren().forEach((child) => {
                 if (!child.active && (child as Enemy).enemyType === enemyType) {
-                    //  We found a dead matching germ, so resurrect it
+                    //  We found a dead matching enemy, so resurrect it
                     newEnemy = child as Enemy;
+
+                    console.log("normal enemy resurrected");
                 }
             });
-
             // @ts-ignore
             if (newEnemy === undefined) {
                 newEnemy = new Enemy(this.scene as GameMain, enemyType);
                 this.add(newEnemy);
             }
+
             newEnemy.start(x, y, velocity);
         }
         else {
@@ -92,8 +129,25 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
                 console.error("Text config is undefined for text enemy!");
                 return;
             }
-            let newEnemy: TextEnemy = new TextEnemy(this.scene as GameMain, enemyType, textConfig);
-            this.add(newEnemy);
+
+            let newEnemy: TextEnemy;
+
+            if (enemyTypeKey === "5") {
+                this.getChildren().forEach((child) => {
+                    if (!child.active && (child as Enemy).enemyType === enemyType && (child as LetterEnemy).character === textConfig.text) {
+                        //  We found a dead matching enemy, so resurrect it
+                        newEnemy = child as TextEnemy;
+
+                        console.log("letter enemy resurrected");
+                    }
+                });
+            }
+            // @ts-ignore
+            if (newEnemy === undefined) {
+                newEnemy = new TextEnemy(this.scene as GameMain, enemyType, textConfig);
+                this.add(newEnemy);
+            }
+
             newEnemy.start(x, y, velocity);
         }
     }
@@ -183,7 +237,7 @@ export class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
 
 }
 
-export class Enemy extends EnemyAbstract {
+class Enemy extends EnemyAbstract {
 
     constructor(scene: GameMain, type: EnemyType) {
         super(scene, type);
@@ -193,7 +247,7 @@ export class Enemy extends EnemyAbstract {
     }
 }
 
-export class TextEnemy extends EnemyAbstract {
+class TextEnemy extends EnemyAbstract {
     bitmapText: Phaser.GameObjects.BitmapText;
 
     constructor(scene: GameMain, type: EnemyType, textConfig: TextConfig) {
@@ -215,6 +269,7 @@ export class TextEnemy extends EnemyAbstract {
 
     start(x: number, y: number, velocity: Phaser.Math.Vector2) {
         super.start(x, y, velocity);
+        this.bitmapText.setActive(true);
         this.bitmapText.setVisible(true);
     }
 
@@ -227,5 +282,26 @@ export class TextEnemy extends EnemyAbstract {
         super.update();
         this.bitmapText.setX(this.x);
         this.bitmapText.setY(this.y);
+    }
+}
+
+class LetterEnemy extends TextEnemy {
+    character: string;
+
+    constructor(scene: GameMain, type: EnemyType, textConfig: TextConfig) {
+        super(scene, type, textConfig);
+
+        this.character = textConfig.text;
+        if (this.character.length !== 1) {
+            console.error("Character length of LetterEnemy is not 1!");
+            console.error(textConfig);
+        }
+    }
+
+    kill() {
+        this.setActive(false);
+        this.setVisible(false);
+        this.bitmapText.setActive(false);
+        this.bitmapText.setVisible(false);
     }
 }
