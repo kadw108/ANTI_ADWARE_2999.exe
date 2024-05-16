@@ -121,7 +121,9 @@ export default class GameMain extends Phaser.Scene {
 
     update(): void {
         this.player.update();
-        
+       
+        this.enemyGroup.updateAll();
+
         if (this.performanceScore <= 0) {
             this.gameOver();
         }

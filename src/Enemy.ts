@@ -105,6 +105,12 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             (child as EnemyAbstract).kill();
         });
     }
+
+    updateAll() {
+        this.getChildren().forEach((child) => {
+            (child as EnemyAbstract).update();
+        });
+    }
 }
 
 export class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
@@ -193,18 +199,33 @@ export class TextEnemy extends EnemyAbstract {
     constructor(scene: GameMain, type: EnemyType, textConfig: TextConfig) {
         super(scene, type);
         this.bitmapText = new Phaser.GameObjects.BitmapText(scene, 0, 0, "DisplayFont", textConfig.text, textConfig.fontSize);
+        this.scene.add.existing(this.bitmapText);
+
+        this.setOrigin(0.5);
+        this.bitmapText.setOrigin(0.5);
+
+        this.scaleX = this.bitmapText.width;
+        this.scaleY = this.bitmapText.height;
+
+        this.setTintFill(0x0000ff);
+
+        this.setDepth(0);
+        this.bitmapText.setDepth(1);
     }
 
     start(x: number, y: number, velocity: Phaser.Math.Vector2) {
         super.start(x, y, velocity);
-
-        this.bitmapText.setX(x);
-        this.bitmapText.setY(y);
         this.bitmapText.setVisible(true);
     }
 
     kill() {
         this.bitmapText.destroy();
         this.destroy();
+    }
+
+    update() {
+        super.update();
+        this.bitmapText.setX(this.x);
+        this.bitmapText.setY(this.y);
     }
 }
