@@ -34,16 +34,21 @@ export class PlayerBulletGroup extends Phaser.Physics.Arcade.Group
 
 export class PlayerBullet extends Phaser.Physics.Arcade.Sprite
 {
+    dynamicBody: Phaser.Physics.Arcade.Body;
+
     constructor (scene: Phaser.Scene, x: number, y: number)
     {
         super(scene, x, y, 'circle');
         this.scale = 0.1;
+
         scene.physics.add.existing(this);
+        // @ts-ignore
+        this.dynamicBody = this.body as Phaser.Physics.Arcade.Body;
     }
 
     fire (x: number, y: number)
     {
-        this.body!.reset(x, y);
+        this.dynamicBody.reset(x, y);
 
         this.setActive(true);
         this.setVisible(true);

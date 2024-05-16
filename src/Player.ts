@@ -3,6 +3,7 @@ import GameMain from "./Game";
 const SHOOT_COOLDOWN: number = 500;
 const HIT_COOLDOWN: number = 700;
 const SPEED: number = 160;
+const MAX_HP: number = 20;
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     scene: GameMain;
@@ -21,15 +22,17 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     constructor(scene: GameMain) {
         super(scene, 450, 550, "circle");
-        this.scale = 0.4;
+        this.scale = 0.4; // sprite = circle w radius 20
 
         this.scene = scene;
 
         scene.add.existing(this);
         scene.physics.add.existing(this);
+        // @ts-ignore
         this.dynamicBody = this.body as Phaser.Physics.Arcade.Body;
-        this.setCollideWorldBounds(true, 0, 0);
-        this.setImmovable(true);
+        this.dynamicBody.setCircle(15); // collision = circle w radius 15
+        this.dynamicBody.setCollideWorldBounds(true, 0, 0);
+        this.dynamicBody.setImmovable(true);
 
         this.cursors = scene.input.keyboard!.createCursorKeys();
         this.spacebar = this.scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -37,7 +40,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.canShoot = true;
 
         this.canBeHit = true;
-        this.maxHP = 3;
+        this.maxHP = MAX_HP;
         this.currentHP = this.maxHP;
 
         this.isAlive = false;

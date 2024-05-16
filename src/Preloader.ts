@@ -1,3 +1,5 @@
+import { CONSTANTS } from "./CONSTANTS_FILE";
+
 export default class Preloader extends Phaser.Scene
 {
     loadText: Phaser.GameObjects.Text;
@@ -10,12 +12,21 @@ export default class Preloader extends Phaser.Scene
 
     preload ()
     {
-        this.loadText = this.add.text(512, 360, 'Loading ...', { fontFamily: 'Arial', fontSize: 74, color: '#e3f2ed' });
+        this.loadText = this.add.text(CONSTANTS.originX, CONSTANTS.originY, 'Loading ...', { fontFamily: 'DisplayFont', fontSize: 74, color: '#e3f2ed' });
         this.loadText.setOrigin(0.5);
         this.loadText.setStroke('#203c5b', 6);
         this.loadText.setShadow(2, 2, '#2d2d2d', 4, true, false);
 
         this.load.image('logo', 'assets/phaser3-logo.png');    
+
+        this.load.audio("popupBlocked", ["assets/popup_blocked.wav", "assets/popup_blocked.mp3"]);
+        this.load.audio("wearyWillow", ["assets/wearyWillow.mp3", "assets/wearyWillow.ogg"]);
+
+        this.load.bitmapFont('DisplayFont', 'assets/VT323Bitmap.png', 'assets/VT323Bitmap.xml');
+
+        this.load.image("circle", "assets/circle.png");
+        this.load.image("square", "assets/square.png");
+        this.load.image("squareSmall", "assets/squareSmall.png");
 
         /*
         this.load.setPath('assets/games/snowmen-attack/');
@@ -31,10 +42,12 @@ export default class Preloader extends Phaser.Scene
         this.load.audio('move', [ 'move.ogg', 'move.m4a', 'move.mp3' ]);
         this.load.audio('hit-snowman', [ 'hit-snowman.ogg', 'hit-snowman.m4a', 'hit-snowman.mp3' ]);
         this.load.audio('gameover', [ 'gameover.ogg', 'gameover.m4a', 'gameover.mp3' ]);
+        */
     }
 
     create ()
     {
+        /*
         //  Create our global animations
 
         this.anims.create({
@@ -127,6 +140,7 @@ export default class Preloader extends Phaser.Scene
             frames: this.anims.generateFrameNames('sprites', { prefix: 'snowman-small-die', start: 0, end: 4 }),
             frameRate: 14
         });
+        */
 
         if (this.sound.locked)
         {
@@ -134,20 +148,13 @@ export default class Preloader extends Phaser.Scene
 
             this.input.once('pointerdown', () => {
 
-                this.scene.start('MainMenu');
+                this.scene.start('Menu');
 
             });
         }
         else
         {
-            this.scene.start('MainMenu');
+            this.scene.start('Menu');
         }
-        */
-
-        const rectangle = this.add.rectangle(450, 350, 200, 200);
-        rectangle.isStroked = true;
-        rectangle.strokeColor = 0x00ffff;
-
-        this.scene.start("Menu");
     }
 }

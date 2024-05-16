@@ -1,5 +1,5 @@
 import Player from "./Player";
-import { Enemy, EnemyGroup } from "./Enemy";
+import { EnemyAbstract, EnemyGroup } from "./Enemy";
 import { PlayerBullet, PlayerBulletGroup } from "./PlayerBullet";
 
 import {CONSTANTS} from "./CONSTANTS_FILE";
@@ -14,8 +14,10 @@ export default class GameMain extends Phaser.Scene {
     rectangleLimit: [number, number, number, number];
 
     hpText: Phaser.GameObjects.Text;
-    performanceScore: Phaser.GameObjects.Text;
-    performanceNumber: number;
+
+    performanceScoreText: Phaser.GameObjects.Text;
+    performanceDecreaseEvent: Phaser.Time.TimerEvent;
+    performanceScore: number;
 
     gameOverGroup: Phaser.GameObjects.Group;
 
@@ -27,11 +29,6 @@ export default class GameMain extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image("circle", "assets/circle.png");
-        this.load.image("square", "assets/square.png");
-        this.load.image("squareSmall", "assets/squareSmall.png");
-
-        this.load.audio("popupBlocked", ["assets/popup_blocked.wav", "assets/popup_blocked.mp3"]);
     }
 
     create(): void {
@@ -54,15 +51,17 @@ export default class GameMain extends Phaser.Scene {
         // from https://github.com/phaserjs/examples/blob/master/public/src/physics/arcade/world%20bounds%20event%20custom.js
         this.physics.world.on("worldbounds", function (body: Phaser.Physics.Arcade.Body, up: boolean, down: boolean, left: boolean, right: boolean) {
             // @ts-ignore
-            if (body.gameObject.onWorldBounds !== undefined) {
+            if (body.onWorldBounds !== undefined) {
                 // @ts-ignore
                 body.gameObject.onWorldBounds(up, down, left, right);
             }
         });
 
-        this.physics.add.overlap(this.player, this.enemyGroup, (player, enemy) => this.playerHitEnemy(player as Player, enemy as Enemy));
+        // @ts-ignore
+        this.physics.add.overlap(this.player, this.enemyGroup, (player, enemy) => this.playerHitEnemy(player as Player, enemy as EnemyAbstract));
         this.physics.add.overlap(this.playerBulletGroup, this.enemyGroup, (bullet, enemy) => {
-            this.playerBulletHitEnemy(bullet as PlayerBullet, enemy as Enemy);
+            // @ts-ignore
+            this.playerBulletHitEnemy(bullet as PlayerBullet, enemy as EnemyAbstract);
         });
 
         this.hpText = this.add.text(10, 20, "", { fontFamily: "DisplayFont", fontSize: 40, color: "#ffffff" });
@@ -71,12 +70,17 @@ export default class GameMain extends Phaser.Scene {
         this.hpText.setShadow(2, 2, "#66ccff", 4, true, false);
         this.hpText.text = "HP: " + this.player.currentHP + "/" + this.player.maxHP;
 
-        this.performanceNumber = 5000;
-        this.performanceScore = this.add.text(CONSTANTS.width - 10, 20, "", { fontFamily: "DisplayFont", fontSize: 30, color: "#ffffff" });
-        this.performanceScore.setOrigin(1, 0);
-        this.performanceScore.setStroke("#203c5b", 6);
-        this.performanceScore.setShadow(2, 2, "#66ccff", 4, true, false);
-        this.performanceScore.text = "Employee Performance: "  + this.performanceNumber;
+        this.performanceScore = 5000;
+        this.performanceScoreText = this.add.text(CONSTANTS.width - 10, 20, "", { fontFamily: "DisplayFont", fontSize: 30, color: "#ffffff" });
+        this.performanceScoreText.setOrigin(1, 0);
+        this.performanceScoreText.setStroke("#203c5b", 6);
+        this.performanceScoreText.setShadow(2, 2, "#66ccff", 4, true, false);
+        this.updatePerformance();
+
+        this.performanceDecreaseEvent = this.time.addEvent({ delay: 50, loop: true, callback: () => {
+            this.performanceScore -= 1;
+            this.updatePerformance();
+        }});
 
         const gameOverRect = this.add.rectangle(CONSTANTS.originX, CONSTANTS.originY, CONSTANTS.width, CONSTANTS.height, 0x0000ff);
         gameOverRect.depth = 4;
@@ -88,15 +92,18 @@ export default class GameMain extends Phaser.Scene {
         this.gameOverGroup = this.add.group([gameOverRect, gameOverText, subtitle]);
         this.gameOverGroup.setVisible(false);
 
+        const wearyWillow = this.sound.add('wearyWillow', { loop: true, delay: 10 });
+        wearyWillow.play();
+
         this.start();
     }
 
-    playerHitEnemy(player: Player, enemy: Enemy) {
+    playerHitEnemy(player: Player, enemy: EnemyAbstract) {
         if (enemy.active) {
             player.hit();
         }
     }
-    playerBulletHitEnemy(bullet: PlayerBullet, enemy: Enemy) {
+    playerBulletHitEnemy(bullet: PlayerBullet, enemy: EnemyAbstract) {
         if (bullet.active && enemy.active) {
             bullet.kill();
             enemy.hit();
@@ -108,15 +115,23 @@ export default class GameMain extends Phaser.Scene {
         this.enemyGroup.start();
     }
 
+    updatePerformance(): void {
+        this.performanceScoreText.text = "Employee Performance: "  + this.performanceScore;
+    }
+
     update(): void {
         this.player.update();
-
-
+        
+        if (this.performanceScore <= 0) {
+            this.gameOver();
+        }
     }
 
     gameOver(): void {
         this.sound.stopAll();
         // this.sound.play("gameover");
+
+        this.performanceDecreaseEvent.destroy();
 
         this.enemyGroup.stop();
         this.playerBulletGroup.stop();
