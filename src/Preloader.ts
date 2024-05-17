@@ -17,8 +17,6 @@ export default class Preloader extends Phaser.Scene
         this.loadText.setStroke('#203c5b', 6);
         this.loadText.setShadow(2, 2, '#2d2d2d', 4, true, false);
 
-        this.load.image('logo', 'assets/phaser3-logo.png');    
-
         this.load.audio("popupBlocked", ["assets/popup_blocked.wav", "assets/popup_blocked.mp3"]);
         this.load.audio("wearyWillow", ["assets/wearyWillow.mp3", "assets/wearyWillow.ogg"]);
 
@@ -27,6 +25,8 @@ export default class Preloader extends Phaser.Scene
         this.load.image("circle", "assets/circle.png");
         this.load.image("square", "assets/square.png");
         this.load.image("squareSmall", "assets/squareSmall.png");
+
+        this.load.spritesheet('sheetWavy', 'assets/sheetWavy.png', { frameWidth: 900, frameHeight: 9 });
 
         /*
         this.load.setPath('assets/games/snowmen-attack/');
@@ -47,6 +47,13 @@ export default class Preloader extends Phaser.Scene
 
     create ()
     {
+        this.anims.create({
+            key: 'wavy',
+            frames: this.anims.generateFrameNumbers('sheetWavy', { frames: [ 0, 1, 2 ] }),
+            frameRate: 8,
+            repeat: -1
+        });
+
         /*
         //  Create our global animations
 

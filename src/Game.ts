@@ -100,11 +100,11 @@ export default class GameMain extends Phaser.Scene {
 
     playerHitEnemy(player: Player, enemy: EnemyAbstract) {
         if (enemy.active) {
-            player.hit();
+            enemy.onHitPlayer(player);
         }
     }
     playerBulletHitEnemy(bullet: PlayerBullet, enemy: EnemyAbstract) {
-        if (bullet.active && enemy.active) {
+        if (bullet.active && enemy.active && enemy.canHit) {
             bullet.kill();
             enemy.hit();
         }

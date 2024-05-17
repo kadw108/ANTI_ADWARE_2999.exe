@@ -22,7 +22,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     constructor(scene: GameMain) {
         super(scene, 450, 550, "circle");
-        this.scale = 0.2; // sprite = circle w radius 15
+        this.scale = 0.26; // sprite = circle w radius 13
 
         this.scene = scene;
 
@@ -30,7 +30,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         scene.physics.add.existing(this);
         // @ts-ignore
         this.dynamicBody = this.body as Phaser.Physics.Arcade.Body;
-        this.dynamicBody.setCircle(10); // collision = circle w radius 15
         this.dynamicBody.setCollideWorldBounds(true, 0, 0);
         this.dynamicBody.setImmovable(true);
 

@@ -1,5 +1,6 @@
 import { CONSTANTS } from "./CONSTANTS_FILE";
 import GameMain from "./Game";
+import Player from "./Player";
 
 type TextConfig = {
     text: string;
@@ -61,6 +62,35 @@ function generateLetterText(releaseEvents: Array<ReleaseEvent>): undefined | Arr
     return results;
 }
 
+function generateConfig(): Array<ReleaseEvent> {
+    let config: Array<ReleaseEvent> = [];
+
+    /*
+    config = [
+        { x: 400, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 1000, type: "0" },
+        { x: 400, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 2000, type: "0" },
+        { x: 500, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 3000, type: "0" },
+        { x: 500, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 4000, type: "0" },
+    ];
+    */
+
+    const letters = generateLetterText([
+        { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 1000, type: "word", textConfig: { text: "ARE YOU READY?", fontSize: 72 } },
+        { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 3000, type: "word", textConfig: { text: "GET SET", fontSize: 72 } },
+        { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 4000, type: "word", textConfig: { text: "GO!", fontSize: 72 } },
+    ]);
+
+    for (const i of letters!) {
+        config.push(i);
+    }
+
+    for (let i = 0; i < 30; i++) {
+        config.push({ x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 720 * i, type: "wavy" });
+    }
+
+    return config;
+}
+
 export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     config: Array<ReleaseEvent>;
     typeList: { [id: string]: EnemyType };
@@ -69,32 +99,16 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
         super(scene.physics.world, scene);
 
         this.typeList = {
-            "0": { width: 200, height: 75, hp: 2 }, // 0
-            "1": { width: 50, height: 50, hp: 1 }, // 1
-            "2": { width: 18, height: 18, hp: 1 }, // 2
-            "3": { width: CONSTANTS.width, height: 2, hp: 1 }, // 3
+            "0": { width: 200, height: 75, hp: 2 },
+            "1": { width: 50, height: 50, hp: 1 },
+            "2": { width: 18, height: 18, hp: 1 },
+            "3": { width: CONSTANTS.width, height: 2, hp: 1 },
+            "wavy": { width: CONSTANTS.width, height: 9, hp: -1 },
             word: { width: -1, height: -1, hp: 4, text: true },
             letter: { width: -1, height: -1, hp: 1, text: true },
         };
 
-        /* this.config = [
-            { x: 400, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 1000, type: 0 },
-            { x: 400, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 2000, type: 0 },
-            { x: 500, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 3000, type: 0 },
-            { x: 500, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 4000, type: 0 },
-        ]; */
-        const letters = generateLetterText([
-            { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 500, type: "word", textConfig: { text: "GET READY", fontSize: 72 } },
-            { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 1500, type: "word", textConfig: { text: "YOU DON'T WANT TO MISS THIS", fontSize: 72 } },
-            { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 2500, type: "word", textConfig: { text: "BEST DEALS OF YOUR LIFE!", fontSize: 72 } },
-            { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 3500, type: "word", textConfig: { text: "AND... GO!", fontSize: 100 } }
-        ]);
-
-        this.config = [...letters!];
-
-        for (let i = 0; i < 30; i++) {
-            this.config.push({ x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 720 * i, type: "3" });
-        }
+        this.config = generateConfig();
     }
 
     start() {
@@ -122,13 +136,21 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
                     console.log("normal enemy resurrected");
                 }
             });
+
             // @ts-ignore
             if (newEnemy === undefined) {
-                newEnemy = new Enemy(this.scene as GameMain, enemyType);
+                if (enemyTypeKey !== "wavy") {
+                    newEnemy = new Enemy(this.scene as GameMain, enemyType);
+                }
+                else {
+                    newEnemy = new WavyEnemy(this.scene as GameMain, enemyType);
+                }
+
                 this.add(newEnemy);
             }
 
             newEnemy.start(x, y, velocity);
+
         } else {
             if (textConfig === undefined) {
                 console.error("Text config is undefined for text enemy!");
@@ -139,8 +161,9 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
 
             if (enemyTypeKey === "letter") {
                 this.getChildren().forEach((child) => {
+                    console.log(!child.active, (child as Enemy).enemyType === enemyType, (child as LetterEnemy).character === textConfig.text);
                     if (!child.active && (child as Enemy).enemyType === enemyType && (child as LetterEnemy).character === textConfig.text) {
-                        //  We found a dead matching enemy, so resurrect it
+                        // We found a dead matching enemy, so resurrect it
                         newEnemy = child as LetterEnemy;
 
                         console.log("letter enemy resurrected");
@@ -173,13 +196,14 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     }
 }
 
-export class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
+export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
     scene: GameMain;
 
     dynamicBody: Phaser.Physics.Arcade.Body;
     onWorldBounds: Function;
 
     currentHp: number;
+    canHit: boolean;
     enemyType: EnemyType;
 
     hitNum: number;
@@ -188,7 +212,14 @@ export class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
         super(scene, 0, 0, "squareSmall");
         this.scene = scene;
 
-        this.currentHp = type.hp;
+        if (type.hp > 0) {
+            this.currentHp = type.hp;
+            this.canHit = true;
+        }
+        else {
+            this.currentHp = -1;
+            this.canHit = false;
+        }
         this.enemyType = type;
 
         this.hitNum = 0;
@@ -240,6 +271,10 @@ export class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
     clearHit() {
         this.clearTint();
     }
+
+    onHitPlayer(player: Player): void {
+        player.hit();
+    }
 }
 
 class Enemy extends EnemyAbstract {
@@ -248,6 +283,24 @@ class Enemy extends EnemyAbstract {
 
         this.scaleX = type.width;
         this.scaleY = type.height;
+    }
+}
+
+class WavyEnemy extends EnemyAbstract {
+    constructor(scene: GameMain, type: EnemyType) {
+        super(scene, type);
+
+        this.play("wavy");
+
+        // don't want to set scale because that affects image/anim size, so just
+        // set size of body
+        this.dynamicBody.setSize(type.width, type.height);
+    }
+
+    onHitPlayer(player: Player): void {
+        if (player.dynamicBody.speed === 0) {
+            player.hit();
+        }
     }
 }
 
