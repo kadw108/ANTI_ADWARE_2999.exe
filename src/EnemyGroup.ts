@@ -107,21 +107,30 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
         }
     }
 
-    release(x: number, y: number, velocity: Phaser.Math.Vector2, enemyTypeKey: string, textConfig: TextConfig | undefined, boomerangConfig: BoomerangConfig | undefined) {
+    release(x: number, y: number, velocity: Phaser.Math.Vector2, enemyTypeKey: string, textConfig: TextConfig | undefined, boomerangConfig: BoomerangConfig | undefined): void {
         const enemyType = this.typeList[enemyTypeKey];
 
-        if (enemyType.text !== undefined && textConfig === undefined) {
-            console.error("Text config is undefined for text enemy!");
-            return;
+        if (enemyType.text !== undefined) {
+            if (textConfig === undefined) {
+                console.error("Text config is undefined for text enemy!");
+                return;
+            }
+            if (enemyTypeKey !== "word" && enemyTypeKey !== "letter") {
+                console.error("Enemy type has defined text property, but is not 'word' or 'letter'!");
+                return;
+            }
         }
         if (enemyTypeKey === "boomerang" && boomerangConfig === undefined) {
             console.error("Boomerang config is undefined for boomerang enemy!");
             return;
         }
 
-        let newEnemy: EnemyI = this.resurrectEnemy(x, y, velocity, enemyTypeKey, textConfig!, boomerangConfig!) as EnemyI;
+        if (this.resurrectEnemy(x, y, velocity, enemyTypeKey, textConfig!, boomerangConfig!)) {
+            return;
+        }
 
-        if (enemyType.text === undefined && newEnemy === undefined) {
+        let newEnemy: EnemyI;
+        if (enemyType.text === undefined) {
             if (enemyTypeKey === "wavy") {
                 newEnemy = new WavyEnemy(this.scene as GameMain, enemyType, velocity);
             } else if (enemyTypeKey === "boomerang") {
@@ -134,25 +143,25 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
 
             this.add(newEnemy as unknown as Phaser.GameObjects.GameObject);
             newEnemy.start(x, y, velocity);
-        } else if (enemyType.text !== undefined && newEnemy === undefined) {
+        } else {
             if (enemyTypeKey === "letter") {
                 newEnemy = new LetterEnemy(this.scene as GameMain, enemyType, textConfig!, velocity);
             } else if (enemyTypeKey === "word") {
                 newEnemy = new TextEnemy(this.scene as GameMain, enemyType, textConfig!, velocity);
             }
+            // the checks at the start catch the 'else' category
 
-            this.add(newEnemy as unknown as Phaser.GameObjects.GameObject);
-            newEnemy.start(x, y, velocity);
+            this.add(newEnemy! as unknown as Phaser.GameObjects.GameObject);
+            newEnemy!.start(x, y, velocity);
         }
     }
 
-    resurrectEnemy(x: number, y: number, velocity: Phaser.Math.Vector2, enemyTypeKey: string, textConfig: TextConfig, boomerangConfig: BoomerangConfig): EnemyI | undefined {
+    resurrectEnemy(x: number, y: number, velocity: Phaser.Math.Vector2, enemyTypeKey: string, textConfig: TextConfig, boomerangConfig: BoomerangConfig): boolean {
         const enemyType = this.typeList[enemyTypeKey];
 
         if (enemyType.text === undefined) {
-            this.getChildren().forEach((child) => {
+            for (const child of this.getChildren()) {
                 if (!child.active && (child as Enemy).enemyType === enemyType) {
-                    //  We found a dead matching enemy, so resurrect it
                     const newEnemy = child as Enemy;
 
                     if (enemyTypeKey === "boomerang") {
@@ -160,21 +169,19 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
                     } else {
                         (newEnemy as Enemy).start(x, y, velocity);
                     }
-                    return newEnemy;
+                    return true;
                 }
-            });
+            }
         } else if (enemyTypeKey === "letter") {
-            this.getChildren().forEach((child) => {
+            for (const child of this.getChildren()) {
                 if (!child.active && (child as Enemy).enemyType === enemyType && (child as LetterEnemy).text === textConfig.text) {
-                    // We found a dead matching enemy, so resurrect it
-                    const newEnemy = child as LetterEnemy;
-                    (newEnemy as LetterEnemy).restart(x, y, velocity, textConfig.fontSize);
-                    return newEnemy;
+                    (child as LetterEnemy).restart(x, y, velocity, textConfig.fontSize);
+                    return true;
                 }
-            });
+            }
         }
 
-        return undefined;
+        return false;
     }
 
     stop() {

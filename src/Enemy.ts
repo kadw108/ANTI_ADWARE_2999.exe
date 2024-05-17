@@ -59,7 +59,8 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite impleme
         // @ts-ignore
         this.dynamicBody = this.body as Phaser.Physics.Arcade.Body;
 
-        this.skipCollision = [initialVelocity.y > 0, initialVelocity.y < 0, initialVelocity.x > 0, initialVelocity.x > 0];
+        // leave skipCollision undefined for now
+        // this.skipCollision = [true, true, true, true];
     }
 
     setHp(hp: number) {
@@ -73,16 +74,18 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite impleme
         this.currentHp = this.maxHP;
     }
 
-    start(x: number, y: number, velocity: Phaser.Math.Vector2) {
+    start(x: number, y: number, initialVelocity: Phaser.Math.Vector2) {
         this.currentHp = this.maxHP;
         this.hitNum = 0;
         this.clearHit();
 
         this.dynamicBody.reset(x, y);
-        this.dynamicBody.setVelocity(velocity.x, velocity.y);
+        this.dynamicBody.setVelocity(initialVelocity.x, initialVelocity.y);
 
         this.setActive(true);
         this.setVisible(true);
+
+        this.skipCollision = [initialVelocity.y > 0, initialVelocity.y < 0, initialVelocity.x > 0, initialVelocity.x > 0];
     }
 
     kill() {
@@ -216,9 +219,6 @@ export class BoomerangEnemy extends Enemy {
         });
 
         this.reverseEvent = this.scene.time.delayedCall(this.stayTime + this.reverseTime, () => {
-            this.onWorldBounds = function () {
-                this.kill();
-            };
             this.dynamicBody.velocity = this.initialVelocity.negate();
         });
     }
@@ -280,12 +280,21 @@ export class LetterEnemy extends TextEnemy {
         super.start(x, y, velocity);
         this.bitmapText.setFontSize(fontSize);
         this.setScale(this.bitmapText.width, this.bitmapText.height);
+
+        this.setVisible(true);
+        this.bitmapText.setVisible(false);
+
+        // probably unnecessary
+        this.bitmapText.setX(this.x);
+        this.bitmapText.setY(this.y);
     }
 
     kill() {
         this.bitmapText.setActive(false);
         this.bitmapText.setVisible(false);
         this.setActive(false);
+
+        this.setVisible(false);
     }
 
     hit() {
