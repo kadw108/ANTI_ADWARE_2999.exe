@@ -17,9 +17,9 @@ export function generateConfig(): Array<ReleaseEvent> {
     */
 
     const letters = generateLetterText([
-        { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 1000, type: "word", textConfig: { text: "ARE*YOU*READY?", fontSize: 72 } },
-        { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 3000, type: "word", textConfig: { text: "GET*SET", fontSize: 72 } },
-        { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 4000, type: "word", textConfig: { text: "GO!", fontSize: 72 } },
+        { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 1000, type: "word", textConfig: { text: "ARE*YOU*READY?", fontSize: 80 } },
+        { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 3000, type: "word", textConfig: { text: "GET*SET", fontSize: 80 } },
+        { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 4000, type: "word", textConfig: { text: "GO!", fontSize: 120 } },
     ]);
     for (const i of letters!) {
         config.push(i);
@@ -31,9 +31,9 @@ export function generateConfig(): Array<ReleaseEvent> {
     for (let i = 0; i < 13; i++) {
         for (let j = 0; j < 20; j++) {
             if (i % 2 === 0) {
-                config.push({ x: 0 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 26 * j, type: "letter", textConfig: { text: diag1[j % 2], fontSize: 35 } });
+                config.push({ x: 0 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 36 * j, type: "letter", textConfig: { text: diag1[j % 2], fontSize: 40 } });
             } else {
-                config.push({ x: CONSTANTS.width - j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 26 * j, type: "letter", textConfig: { text: diag2[j % 2], fontSize: 60 } });
+                config.push({ x: CONSTANTS.width - j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 36 * j, type: "letter", textConfig: { text: diag2[j % 2], fontSize: 70 } });
             }
         }
     }
@@ -66,16 +66,15 @@ export function generateConfig(): Array<ReleaseEvent> {
         }
     }
 
-    const START1 = 44440;
-    // const SPACE1 = 2760;
-    const SPACE1 = 1000;
+    const START1 = 46080;
+    const SPACE1 = 720;
     config.push({
         x: CONSTANTS.originX,
         y: -50,
         velocity: new Phaser.Math.Vector2(0, 200),
         time: START1,
         type: "boomerang",
-        boomerangConfig: { stayTime: 1000, reverseTime: 9000 },
+        boomerangConfig: { stayTime: SPACE1, reverseTime: 7920 },
     });
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 20; j++) {
@@ -84,7 +83,7 @@ export function generateConfig(): Array<ReleaseEvent> {
                     x: CONSTANTS.originX,
                     y: 200,
                     velocity: new Phaser.Math.Vector2(100 - j * 10, 200),
-                    time: START1 + SPACE1 + i * 720 + j * 72,
+                    time: START1 + SPACE1 + i * 720 + j * 76,
                     type: "circle",
                 });
             } else {
@@ -92,21 +91,21 @@ export function generateConfig(): Array<ReleaseEvent> {
                     x: CONSTANTS.originX,
                     y: 200,
                     velocity: new Phaser.Math.Vector2(-100 + j * 10, 200),
-                    time: START1 + SPACE1 + i * 720 + j * 72,
+                    time: START1 + SPACE1 + i * 720 + j * 76,
                     type: "circle",
                 });
             }
         }
     }
 
-    const START2 = 53608;
+    const START2 = 56368;
     config.push({
         x: CONSTANTS.originX,
         y: -50,
         velocity: new Phaser.Math.Vector2(0, 200),
         time: START2,
         type: "boomerang",
-        boomerangConfig: { stayTime: 1000, reverseTime: 9000 },
+        boomerangConfig: { stayTime: SPACE1, reverseTime: 7920 },
     });
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 20; j++) {
@@ -115,7 +114,7 @@ export function generateConfig(): Array<ReleaseEvent> {
                     x: CONSTANTS.originX,
                     y: 200,
                     velocity: new Phaser.Math.Vector2(100 - j * 10, 200),
-                    time: START2 + SPACE1 + 2760 + i * 720 + j * 72,
+                    time: START2 + SPACE1 + i * 720 + j * 76,
                     type: "circle",
                 });
             } else {
@@ -123,11 +122,16 @@ export function generateConfig(): Array<ReleaseEvent> {
                     x: CONSTANTS.originX,
                     y: 200,
                     velocity: new Phaser.Math.Vector2(-100 + j * 10, 200),
-                    time: START2 + SPACE1 + 2760 + i * 720 + j * 72,
+                    time: START2 + SPACE1 + i * 720 + j * 76,
                     type: "circle",
                 });
             }
         }
+    }
+
+    const START3 = 63360;
+    for (let i = 0; i < 10; i++) {
+        config.push({ x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: START3 + 90 * i, type: "wavy" });
     }
 
     return config;
