@@ -1,10 +1,16 @@
 import { CONSTANTS } from "./CONSTANTS_FILE";
-import { Enemy, WavyEnemy, LetterEnemy, TextEnemy, EnemyAbstract } from "./Enemy";
+import { EnemyI, Enemy, WavyEnemy, LetterEnemy, TextEnemy, EnemyAbstract, BoomerangEnemy, CircleEnemy } from "./Enemy";
+import { generateConfig } from "./EnemyConfig";
 import GameMain from "./Game";
 
 export type TextConfig = {
     text: string;
     fontSize: number;
+};
+
+export type BoomerangConfig = {
+    stayTime: number;
+    reverseTime: number; // additive onto stayTime, i.e. relative not absolute
 };
 
 export type EnemyType = {
@@ -14,13 +20,15 @@ export type EnemyType = {
     text?: true | undefined;
 };
 
-type ReleaseEvent = {
+export type ReleaseEvent = {
     x: number;
     y: number;
     velocity: Phaser.Math.Vector2;
     time: number;
     type: string;
+    hp?: number | undefined;
     textConfig?: TextConfig;
+    boomerangConfig?: BoomerangConfig;
 };
 
 /*
@@ -30,7 +38,7 @@ individual letter enemies.
 DOES NOT WORK WITH STRINGS CONTAINING UNICODE SPECIAL CHARACTERS DUE TO WIDTH (xadvance)
 TODO - if you want it to work, must dynamically get FONTWIDTH
 */
-function generateLetterText(releaseEvents: Array<ReleaseEvent>): undefined | Array<ReleaseEvent> {
+export function generateLetterText(releaseEvents: Array<ReleaseEvent>): undefined | Array<ReleaseEvent> {
     const results = [];
 
     for (const releaseEvent of releaseEvents) {
@@ -65,74 +73,6 @@ function generateLetterText(releaseEvents: Array<ReleaseEvent>): undefined | Arr
     return results;
 }
 
-function generateConfig(): Array<ReleaseEvent> {
-    let config: Array<ReleaseEvent> = [];
-
-    /*
-    config = [
-        { x: 400, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 1000, type: "0" },
-        { x: 400, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 2000, type: "0" },
-        { x: 500, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 3000, type: "0" },
-        { x: 500, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 4000, type: "0" },
-    ];
-    */
-
-    const letters = generateLetterText([
-        { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 1000, type: "word", textConfig: { text: "ARE*YOU*READY?", fontSize: 72 } },
-        { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 3000, type: "word", textConfig: { text: "GET*SET", fontSize: 72 } },
-        { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 4000, type: "word", textConfig: { text: "GO!", fontSize: 72 } },
-    ]);
-    for (const i of letters!) {
-        config.push(i);
-    }
-
-    // diagonal ups
-    const diag1 = ["✦", "✧"];
-    const diag2 = ["$", "€"];
-    for (let i = 0; i < 13; i++) {
-        for (let j = 0; j < 20; j++)  {
-            if (i % 2 === 0) {
-                config.push({ x: 0 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 26 * j, type: "letter", textConfig: {text: diag1[j % 2], fontSize: 42}} );
-            }
-            else {
-                config.push({ x: CONSTANTS.width - j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 26 * j, type: "letter", textConfig: {text: diag2[j % 2], fontSize: 60}} );
-            }
-        }
-    }
-
-    // coming from left
-    const diag3 = ["Y", "U", "B"];
-    for (let i = 0; i < 11; i++) {
-        for (let j = 0; j < 3; j++)  {
-            if (i % 2 === 0) {
-                config.push({ x: -50, y: 475, velocity: new Phaser.Math.Vector2(200, 0), time: 7880 + 1440 * i + 200 * j, type: "letter", textConfig: {text: diag2[j % 2], fontSize: 70, }} );
-            }
-            else {
-                config.push({ x: -50, y: 525, velocity: new Phaser.Math.Vector2(200, 0), time: 7880 + 1440 * i + 200 * j, type: "letter", textConfig: {text: diag3[j % 3], fontSize: 70, }} );
-            }
-        }
-    }
-
-    for (let i = 0; i < 28; i++) {
-        config.push({ x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 23720 + 720 * i, type: "wavy" });
-    }
-
-    // coming from right
-    const diag4 = ["Y", "U", "B"];
-    for (let i = 0; i < 5; i++) {
-        for (let j = 0; j < 3; j++)  {
-            if (i % 2 === 0) {
-                config.push({ x: CONSTANTS.width + 50, y: 475, velocity: new Phaser.Math.Vector2(-200, 0), time: 35960 + 1440 * i + 200 * j, type: "letter", textConfig: {text: diag2[j % 2], fontSize: 70, }} );
-            }
-            else {
-                config.push({ x: CONSTANTS.width + 50, y: 525, velocity: new Phaser.Math.Vector2(-200, 0), time: 35960 + 1440 * i + 200 * j, type: "letter", textConfig: {text: diag4[j % 3], fontSize: 70, }} );
-            }
-        }
-    }
-
-    return config;
-}
-
 export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     config: Array<ReleaseEvent>;
     typeList: { [id: string]: EnemyType };
@@ -145,12 +85,15 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             "1": { width: 50, height: 50, hp: 1 },
             "2": { width: 18, height: 18, hp: 1 },
             "3": { width: CONSTANTS.width, height: 2, hp: 1 },
-            "wavy": { width: CONSTANTS.width, height: 9, hp: -1 },
+            wavy: { width: CONSTANTS.width, height: 9, hp: -1 },
             word: { width: -1, height: -1, hp: 4, text: true },
             letter: { width: -1, height: -1, hp: 1, text: true },
+            boomerang: { width: 75, height: 75, hp: 999 },
+            circle: { width: 10, height: -1, hp: -1}, // height doesn't matter
         };
 
         this.config = generateConfig();
+        // scene.physics.add.group({ collideWorldBounds: true });
     }
 
     start() {
@@ -158,83 +101,97 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             this.scene.time.addEvent({
                 delay: releaseEvent.time,
                 callback: () => {
-                    this.release(releaseEvent.x, releaseEvent.y, releaseEvent.velocity, releaseEvent.type, releaseEvent.textConfig);
+                    this.release(releaseEvent.x, releaseEvent.y, releaseEvent.velocity, releaseEvent.type, releaseEvent.textConfig, releaseEvent.boomerangConfig);
                 },
             });
         }
     }
 
-    release(x: number, y: number, velocity: Phaser.Math.Vector2, enemyTypeKey: string, textConfig: TextConfig | undefined) {
+    release(x: number, y: number, velocity: Phaser.Math.Vector2, enemyTypeKey: string, textConfig: TextConfig | undefined, boomerangConfig: BoomerangConfig | undefined) {
         const enemyType = this.typeList[enemyTypeKey];
 
-        if (enemyType.text === undefined) {
-            let newEnemy: Enemy;
+        if (enemyType.text !== undefined && textConfig === undefined) {
+            console.error("Text config is undefined for text enemy!");
+            return;
+        }
+        if (enemyTypeKey === "boomerang" && boomerangConfig === undefined) {
+            console.error("Boomerang config is undefined for boomerang enemy!");
+            return;
+        }
 
-            this.getChildren().forEach((child) => {
-                if (!child.active && (child as Enemy).enemyType === enemyType) {
-                    //  We found a dead matching enemy, so resurrect it
-                    newEnemy = child as Enemy;
-                }
-            });
+        let newEnemy: EnemyI = this.resurrectEnemy(x, y, velocity, enemyTypeKey, textConfig!, boomerangConfig!) as EnemyI;
 
-            // @ts-ignore
-            if (newEnemy === undefined) {
-                if (enemyTypeKey !== "wavy") {
-                    newEnemy = new Enemy(this.scene as GameMain, enemyType, velocity);
-                }
-                else {
-                    newEnemy = new WavyEnemy(this.scene as GameMain, enemyType, velocity);
-                }
-
-                this.add(newEnemy);
+        if (enemyType.text === undefined && newEnemy === undefined) {
+            if (enemyTypeKey === "wavy") {
+                newEnemy = new WavyEnemy(this.scene as GameMain, enemyType, velocity);
+            } else if (enemyTypeKey === "boomerang") {
+                newEnemy = new BoomerangEnemy(this.scene as GameMain, enemyType, velocity, boomerangConfig!);
+            }
+            else if (enemyTypeKey === "circle") {
+                newEnemy = new CircleEnemy(this.scene as GameMain, enemyType, velocity);
+            } else {
+                newEnemy = new Enemy(this.scene as GameMain, enemyType, velocity);
             }
 
+            this.add(newEnemy as unknown as Phaser.GameObjects.GameObject);
+            // newEnemy.addCollision(velocity);
             newEnemy.start(x, y, velocity);
 
-        } else {
-            if (textConfig === undefined) {
-                console.error("Text config is undefined for text enemy!");
-                return;
-            }
-
-            let newEnemy: TextEnemy;
-
+        } else if (enemyType.text !== undefined && newEnemy === undefined) {
             if (enemyTypeKey === "letter") {
-                this.getChildren().forEach((child) => {
-                    if (!child.active && (child as Enemy).enemyType === enemyType && (child as LetterEnemy).character === textConfig.text) {
-                        // We found a dead matching enemy, so resurrect it
-                        newEnemy = child as LetterEnemy;
-
-                        (newEnemy as LetterEnemy).restart(x, y, velocity, textConfig.fontSize);
-                    }
-                });
-
-                // @ts-ignore
-                if (newEnemy === undefined) {
-                    newEnemy = new LetterEnemy(this.scene as GameMain, enemyType, textConfig, velocity);
-                    this.add(newEnemy);
-                    newEnemy.start(x, y, velocity);
-                }
+                newEnemy = new LetterEnemy(this.scene as GameMain, enemyType, textConfig!, velocity);
+            } else if (enemyTypeKey === "word") {
+                newEnemy = new TextEnemy(this.scene as GameMain, enemyType, textConfig!, velocity);
             }
-            else {
-                newEnemy = new TextEnemy(this.scene as GameMain, enemyType, textConfig, velocity);
-                this.add(newEnemy);
-                newEnemy.start(x, y, velocity);
-            }
+
+            this.add(newEnemy as unknown as Phaser.GameObjects.GameObject);
+            // newEnemy.addCollision(velocity);
+
+            newEnemy.start(x, y, velocity);
         }
     }
 
-    stop() {
-        // this.timedEvent.remove();
+    resurrectEnemy(x: number, y: number, velocity: Phaser.Math.Vector2, enemyTypeKey: string, textConfig: TextConfig, boomerangConfig: BoomerangConfig): EnemyI | undefined {
+        const enemyType = this.typeList[enemyTypeKey];
 
+        if (enemyType.text === undefined) {
+            this.getChildren().forEach((child) => {
+                if (!child.active && (child as Enemy).enemyType === enemyType) {
+                    //  We found a dead matching enemy, so resurrect it
+                    const newEnemy = child as Enemy;
+
+                    if (enemyTypeKey === "boomerang") {
+                        (newEnemy as BoomerangEnemy).start(x, y, velocity, boomerangConfig);
+                    }
+                    else {
+                        (newEnemy as Enemy).start(x, y, velocity);
+                    }
+                    return newEnemy;
+                }
+            });
+        } else if (enemyTypeKey === "letter") {
+            this.getChildren().forEach((child) => {
+                if (!child.active && (child as Enemy).enemyType === enemyType && (child as LetterEnemy).text === textConfig.text) {
+                    // We found a dead matching enemy, so resurrect it
+                    const newEnemy = child as LetterEnemy;
+                    (newEnemy as LetterEnemy).restart(x, y, velocity, textConfig.fontSize);
+                    return newEnemy;
+                }
+            });
+        }
+
+        return undefined;
+    }
+
+    stop() {
         this.getChildren().forEach((child) => {
-            (child as EnemyAbstract).kill();
+            (child as unknown as EnemyI).kill();
         });
     }
 
     updateAll() {
         this.getChildren().forEach((child) => {
-            (child as EnemyAbstract).update();
+            child.update();
         });
     }
 }

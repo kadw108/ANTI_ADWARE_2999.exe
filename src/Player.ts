@@ -3,7 +3,7 @@ import GameMain from "./Game";
 const SHOOT_COOLDOWN: number = 500;
 const HIT_COOLDOWN: number = 700;
 const SPEED: number = 130;
-const MAX_HP: number = 20;
+const MAX_HP: number = 9999;
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     scene: GameMain;

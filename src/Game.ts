@@ -29,9 +29,6 @@ export default class GameMain extends Phaser.Scene {
         this.rectangleLimit = [CONSTANTS.originX, CONSTANTS.originY + 200, 200, 100];
     }
 
-    preload() {
-    }
-
     create(): void {
         this.player = new Player(this);
 
@@ -122,7 +119,6 @@ export default class GameMain extends Phaser.Scene {
 
     update(): void {
         this.player.update();
-       
         this.enemyGroup.updateAll();
 
         if (this.performanceScore <= 0) {
