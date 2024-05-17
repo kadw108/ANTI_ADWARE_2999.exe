@@ -280,21 +280,12 @@ export class LetterEnemy extends TextEnemy {
         super.start(x, y, velocity);
         this.bitmapText.setFontSize(fontSize);
         this.setScale(this.bitmapText.width, this.bitmapText.height);
-
-        this.setVisible(true);
-        this.bitmapText.setVisible(false);
-
-        // probably unnecessary
-        this.bitmapText.setX(this.x);
-        this.bitmapText.setY(this.y);
     }
 
     kill() {
         this.bitmapText.setActive(false);
         this.bitmapText.setVisible(false);
         this.setActive(false);
-
-        this.setVisible(false);
     }
 
     hit() {
