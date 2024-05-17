@@ -1,5 +1,6 @@
 import Player from "./Player";
-import { EnemyI, EnemyGroup } from "./Enemy";
+import { EnemyI } from "./Enemy";
+import { EnemyGroup } from "./EnemyGroup";
 import { PlayerBullet, PlayerBulletGroup } from "./PlayerBullet";
 
 import {CONSTANTS} from "./CONSTANTS_FILE";

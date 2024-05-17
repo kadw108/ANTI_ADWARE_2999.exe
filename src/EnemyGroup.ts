@@ -90,12 +90,12 @@ function generateConfig(): Array<ReleaseEvent> {
     const diag1 = ["✦", "✧"];
     const diag2 = ["$", "€"];
     for (let i = 0; i < 13; i++) {
-        for (let j = 0; j < 28; j++)  {
+        for (let j = 0; j < 20; j++)  {
             if (i % 2 === 0) {
-                config.push({ x: 0 + j * 25, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 22 * j, type: "letter", textConfig: {text: diag1[j % 2], fontSize: 30}} );
+                config.push({ x: 0 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 26 * j, type: "letter", textConfig: {text: diag1[j % 2], fontSize: 42}} );
             }
             else {
-                config.push({ x: CONSTANTS.width - j * 25, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 22 * j, type: "letter", textConfig: {text: diag2[j % 2], fontSize: 50}} );
+                config.push({ x: CONSTANTS.width - j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 26 * j, type: "letter", textConfig: {text: diag2[j % 2], fontSize: 60}} );
             }
         }
     }
