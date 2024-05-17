@@ -40,7 +40,7 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite impleme
 
     skipCollision: [boolean, boolean, boolean, boolean]; // whether to skip collision: up down left right
 
-    // velocity needed so we can determine which wall the enemy SHOULDN'T be destroyed on contact with.
+    // velocity needed so we can determine which edge the enemy SHOULDN'T be destroyed on collision with.
     constructor(scene: GameMain, type: EnemyType, initialVelocity: Phaser.Math.Vector2, hp?: number) {
         super(scene, 0, 0, "squareSmall");
         this.setOrigin(0.5);
@@ -193,40 +193,55 @@ export class CircleEnemy extends EnemyAbstract {
 }
 
 export class BoomerangEnemy extends Enemy {
-    stayTime: number;
     stayEvent: Phaser.Time.TimerEvent | null;
-
-    reverseTime: number;
     reverseEvent: Phaser.Time.TimerEvent | null;
 
-    initialVelocity: Phaser.Math.Vector2;
-
-    constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2, boomerangConfig: BoomerangConfig) {
+    constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
         super(scene, type, velocity);
 
-        this.stayTime = boomerangConfig.stayTime;
+        // leave them undefined for now
+        /*
         this.stayEvent = null;
-        this.reverseTime = boomerangConfig.reverseTime;
         this.reverseEvent = null;
-        this.initialVelocity = velocity;
+        */
     }
 
     start(x: number, y: number, velocity: Phaser.Math.Vector2, boomerangConfig?: BoomerangConfig) {
         super.start(x, y, velocity);
 
-        this.stayEvent = this.scene.time.delayedCall(this.stayTime, () => {
+        if (boomerangConfig === undefined) { // optional only for type purposes, should be mandatory
+            console.error("boomerangConfig is undefined on start call");
+            return;
+        }
+
+        let newVelocity: Phaser.Math.Vector2;
+        if (boomerangConfig.newVelocity === undefined) {
+            newVelocity = velocity.negate();
+        }
+        else {
+            newVelocity = boomerangConfig.newVelocity;
+        }
+
+        this.stayEvent = this.scene.time.delayedCall(boomerangConfig.stayTime, () => {
             this.dynamicBody.velocity.set(0);
         });
-
-        this.reverseEvent = this.scene.time.delayedCall(this.stayTime + this.reverseTime, () => {
-            this.dynamicBody.velocity = this.initialVelocity.negate();
+        this.reverseEvent = this.scene.time.delayedCall(boomerangConfig.stayTime + boomerangConfig.reverseTime, () => {
+            this.skipCollision = [false, false, false, false];
+            this.dynamicBody.velocity = newVelocity;
         });
     }
 
     kill() {
         super.kill();
+
+        this.stayEvent?.destroy();
+        this.reverseEvent?.destroy();
+
         console.log("boomerang dead");
     }
+}
+
+export class HomingEnemy extends Enemy {
 }
 
 export class TextEnemy extends EnemyAbstract {

@@ -11,6 +11,8 @@ export type TextConfig = {
 export type BoomerangConfig = {
     stayTime: number;
     reverseTime: number; // additive onto stayTime, i.e. relative not absolute
+    newVelocity?: Phaser.Math.Vector2 | undefined; // if undefined, it's the reverse of the original velocity,
+    fireMissile?: number | undefined; // number of missiles enemy should fire at player while unmoving; undefined = 0
 };
 
 export type EnemyType = {
@@ -30,48 +32,6 @@ export type ReleaseEvent = {
     textConfig?: TextConfig;
     boomerangConfig?: BoomerangConfig;
 };
-
-/*
-Function that turns ReleaseEvents, each for a single word/phrase, into 
-individual letter enemies.
-
-DOES NOT WORK WITH STRINGS CONTAINING UNICODE SPECIAL CHARACTERS DUE TO WIDTH (xadvance)
-TODO - if you want it to work, must dynamically get FONTWIDTH
-*/
-export function generateLetterText(releaseEvents: Array<ReleaseEvent>): undefined | Array<ReleaseEvent> {
-    const results = [];
-
-    for (const releaseEvent of releaseEvents) {
-        if (releaseEvent.textConfig === undefined) {
-            console.error("generateLetterText running on event with undefined textConfig");
-            return undefined;
-        }
-        if (releaseEvent.type !== "word") {
-            console.log('Advise: run generateLetterText only on events with "word" type enemies.');
-        }
-
-        const FONTWIDTH = 29; // 29 is obtained from the 'xadvance' property in the bitmap xml file
-
-        // 29 is for a 72 height font; must adjust width for variable fontsizes
-        const sizeAdjustedWidth = FONTWIDTH * (releaseEvent.textConfig.fontSize / 72);
-
-        const real_starting_x = releaseEvent.x - (sizeAdjustedWidth * releaseEvent.textConfig.text.length) / 2;
-
-        for (let i = 0; i < releaseEvent.textConfig.text.length; i++) {
-            let newRelease: ReleaseEvent = {
-                x: real_starting_x + i * sizeAdjustedWidth,
-                y: releaseEvent.y,
-                velocity: releaseEvent.velocity,
-                time: releaseEvent.time,
-                type: "letter",
-                textConfig: { text: releaseEvent.textConfig.text[i], fontSize: releaseEvent.textConfig.fontSize },
-            };
-            results.push(newRelease);
-        }
-    }
-
-    return results;
-}
 
 export class EnemyGroup extends Phaser.Physics.Arcade.Group {
     config: Array<ReleaseEvent>;
@@ -134,7 +94,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             if (enemyTypeKey === "wavy") {
                 newEnemy = new WavyEnemy(this.scene as GameMain, enemyType, velocity);
             } else if (enemyTypeKey === "boomerang") {
-                newEnemy = new BoomerangEnemy(this.scene as GameMain, enemyType, velocity, boomerangConfig!);
+                newEnemy = new BoomerangEnemy(this.scene as GameMain, enemyType, velocity);
             } else if (enemyTypeKey === "circle") {
                 newEnemy = new CircleEnemy(this.scene as GameMain, enemyType, velocity);
             } else {
@@ -142,7 +102,12 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             }
 
             this.add(newEnemy as unknown as Phaser.GameObjects.GameObject);
-            newEnemy.start(x, y, velocity);
+            if (enemyTypeKey === "boomerang") {
+                (newEnemy as BoomerangEnemy).start(x, y, velocity, boomerangConfig);
+            }
+            else {
+                newEnemy.start(x, y, velocity);
+            }
         } else {
             if (enemyTypeKey === "letter") {
                 newEnemy = new LetterEnemy(this.scene as GameMain, enemyType, textConfig!, velocity);

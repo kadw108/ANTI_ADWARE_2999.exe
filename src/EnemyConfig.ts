@@ -1,8 +1,50 @@
 import { CONSTANTS } from "./CONSTANTS_FILE";
-import { generateLetterText, ReleaseEvent } from "./EnemyGroup";
+import { ReleaseEvent } from "./EnemyGroup";
 
 const HOR_SPACING = 180;
 const HOR_FONTSIZE = 80;
+
+/*
+Function that turns ReleaseEvents, each for a single word/phrase, into 
+individual letter enemies.
+
+DOES NOT WORK WITH STRINGS CONTAINING UNICODE SPECIAL CHARACTERS DUE TO WIDTH (xadvance)
+TODO - if you want it to work, must dynamically get FONTWIDTH
+*/
+function generateLetterText(releaseEvents: Array<ReleaseEvent>): undefined | Array<ReleaseEvent> {
+    const results = [];
+
+    for (const releaseEvent of releaseEvents) {
+        if (releaseEvent.textConfig === undefined) {
+            console.error("generateLetterText running on event with undefined textConfig");
+            return undefined;
+        }
+        if (releaseEvent.type !== "word") {
+            console.log('Advise: run generateLetterText only on events with "word" type enemies.');
+        }
+
+        const FONTWIDTH = 29; // 29 is obtained from the 'xadvance' property in the bitmap xml file
+
+        // 29 is for a 72 height font; must adjust width for variable fontsizes
+        const sizeAdjustedWidth = FONTWIDTH * (releaseEvent.textConfig.fontSize / 72);
+        const real_starting_x = releaseEvent.x - (sizeAdjustedWidth * releaseEvent.textConfig.text.length / 2) + (sizeAdjustedWidth/2); // add sizeAdjustedWidth/2 because the x is relative to origin
+
+        for (let i = 0; i < releaseEvent.textConfig.text.length; i++) {
+            let newRelease: ReleaseEvent = {
+                x: real_starting_x + i * sizeAdjustedWidth,
+                y: releaseEvent.y,
+                velocity: releaseEvent.velocity,
+                time: releaseEvent.time,
+                type: "letter",
+                textConfig: { text: releaseEvent.textConfig.text[i], fontSize: releaseEvent.textConfig.fontSize },
+            };
+            results.push(newRelease);
+        }
+    }
+
+    return results;
+}
+
 
 export function generateConfig(): Array<ReleaseEvent> {
     let config: Array<ReleaseEvent> = [];
@@ -71,7 +113,7 @@ export function generateConfig(): Array<ReleaseEvent> {
     config.push({
         x: CONSTANTS.originX,
         y: -50,
-        velocity: new Phaser.Math.Vector2(0, 200),
+        velocity: new Phaser.Math.Vector2(0, 350),
         time: START1,
         type: "boomerang",
         boomerangConfig: { stayTime: SPACE1, reverseTime: 7920 },
@@ -102,7 +144,7 @@ export function generateConfig(): Array<ReleaseEvent> {
     config.push({
         x: CONSTANTS.originX,
         y: -50,
-        velocity: new Phaser.Math.Vector2(0, 200),
+        velocity: new Phaser.Math.Vector2(0, 350),
         time: START2,
         type: "boomerang",
         boomerangConfig: { stayTime: SPACE1, reverseTime: 7920 },
