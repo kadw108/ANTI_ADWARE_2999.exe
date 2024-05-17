@@ -20,6 +20,7 @@ export class PlayerBulletGroup extends Phaser.Physics.Arcade.Group
         if (bullet)
         {
             bullet.fire(x, y);
+            this.scene.sound.play("sfxFire");
         }
     }
 

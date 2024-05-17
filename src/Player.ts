@@ -95,7 +95,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.canBeHit = false;
 
             this.setTintFill(0xff0000);
-            this.scene.sound.play("popupBlocked");
+            this.scene.sound.play("sfxHurt");
 
             this.currentHP--;
             this.scene.hpText.text = "HP: " + this.currentHP + "/" + this.maxHP;

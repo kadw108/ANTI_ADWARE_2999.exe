@@ -5,6 +5,7 @@ import Player from "./Player";
 type TextConfig = {
     text: string;
     fontSize: number;
+    showBackground?: boolean;
 };
 
 type ReleaseEvent = {
@@ -26,6 +27,9 @@ type EnemyType = {
 /*
 Function that turns ReleaseEvents, each for a single word/phrase, into 
 individual letter enemies.
+
+DOES NOT WORK WITH STRINGS CONTAINING UNICODE SPECIAL CHARACTERS DUE TO WIDTH (xadvance)
+TODO - if you want it to work, must dynamically get FONTWIDTH
 */
 function generateLetterText(releaseEvents: Array<ReleaseEvent>): undefined | Array<ReleaseEvent> {
     const results = [];
@@ -78,16 +82,28 @@ function generateConfig(): Array<ReleaseEvent> {
         { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 1000, type: "word", textConfig: { text: "ARE YOU READY?", fontSize: 72 } },
         { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 3000, type: "word", textConfig: { text: "GET SET", fontSize: 72 } },
         { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 4000, type: "word", textConfig: { text: "GO!", fontSize: 72 } },
-
-        { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 7000, type: "word", textConfig: { text: "TEST LMAO. GET SET GO", fontSize: 72 } },
     ]);
-
     for (const i of letters!) {
         config.push(i);
     }
 
+    /*
     for (let i = 0; i < 30; i++) {
         config.push({ x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 720 * i, type: "wavy" });
+    }
+    */
+
+    const diag1 = ["✦", "✧"];
+    const diag2 = ["$", "€"];
+    for (let i = 0; i < 15; i++) {
+        for (let j = 0; j < 38; j++)  {
+            if (i % 2 === 0) {
+                config.push({ x: 0 + j * 25, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 22 * j, type: "letter", textConfig: {text: diag1[j % 2], fontSize: 30, showBackground: false}} );
+            }
+            else {
+                config.push({ x: CONSTANTS.width - j * 25, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 22 * j, type: "letter", textConfig: {text: diag2[j % 2], fontSize: 40, showBackground: false}} );
+            }
+        }
     }
 
     return config;
@@ -254,7 +270,8 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
     }
 
     hit() {
-        this.scene.sound.play("popupBlocked");
+        console.log("hit", this.currentHp);
+
         this.currentHp -= 1;
 
         this.setTintFill(0xff0000);
@@ -267,7 +284,11 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
         });
 
         if (this.currentHp <= 0) {
+            this.scene.sound.play("sfxDestroy2");
             this.kill();
+        }
+        else {
+            this.scene.sound.play("sfxDestroy");
         }
     }
 
@@ -309,9 +330,18 @@ class WavyEnemy extends EnemyAbstract {
 
 class TextEnemy extends EnemyAbstract {
     bitmapText: Phaser.GameObjects.BitmapText;
+    showBackground: boolean;
 
     constructor(scene: GameMain, type: EnemyType, textConfig: TextConfig) {
         super(scene, type);
+
+        if (textConfig.showBackground === undefined) {
+            this.showBackground = true;
+        }
+        else {
+            this.showBackground = textConfig.showBackground;
+        }
+
         this.bitmapText = new Phaser.GameObjects.BitmapText(scene, 0, 0, "DisplayFont", textConfig.text, textConfig.fontSize);
         this.scene.add.existing(this.bitmapText);
 
@@ -329,6 +359,10 @@ class TextEnemy extends EnemyAbstract {
 
     start(x: number, y: number, velocity: Phaser.Math.Vector2) {
         super.start(x, y, velocity);
+        if (!this.showBackground) {
+            this.setVisible(false);
+        }
+
         this.bitmapText.setActive(true);
         this.bitmapText.setVisible(true);
     }
@@ -360,8 +394,9 @@ class LetterEnemy extends TextEnemy {
 
     restart(x: number, y: number, velocity: Phaser.Math.Vector2, fontSize: number) {
         super.start(x, y, velocity);
-
-        this.setTintFill(0x0000ff);
+        if (!this.showBackground) {
+            this.setVisible(false);
+        }
 
         this.bitmapText.setFontSize(fontSize);
         this.scaleX = this.bitmapText.width;
@@ -373,5 +408,9 @@ class LetterEnemy extends TextEnemy {
         this.setVisible(false);
         this.bitmapText.setActive(false);
         this.bitmapText.setVisible(false);
+    }
+
+    clearHit() {
+        this.setTintFill(0x0000ff);
     }
 }

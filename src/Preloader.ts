@@ -17,7 +17,10 @@ export default class Preloader extends Phaser.Scene
         this.loadText.setStroke('#203c5b', 6);
         this.loadText.setShadow(2, 2, '#2d2d2d', 4, true, false);
 
-        this.load.audio("popupBlocked", ["assets/popup_blocked.wav", "assets/popup_blocked.mp3"]);
+        this.load.audio("sfxDestroy", ["assets/sfx_destroy.wav"]);
+        this.load.audio("sfxDestroy2", ["assets/sfx_destroy2.wav"]);
+        this.load.audio("sfxFire", ["assets/sfx_fire.wav"]);
+        this.load.audio("sfxHurt", ["assets/sfx_hurt.wav"]);
         this.load.audio("wearyWillow", ["assets/wearyWillow.mp3", "assets/wearyWillow.ogg"]);
 
         this.load.bitmapFont('DisplayFont', 'assets/VT323Bitmap.png', 'assets/VT323Bitmap.xml');
