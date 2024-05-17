@@ -2,7 +2,7 @@ import GameMain from "./Game";
 
 const SHOOT_COOLDOWN: number = 500;
 const HIT_COOLDOWN: number = 700;
-const SPEED: number = 160;
+const SPEED: number = 130;
 const MAX_HP: number = 20;
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
@@ -22,7 +22,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     constructor(scene: GameMain) {
         super(scene, 450, 550, "circle");
-        this.scale = 0.26; // sprite = circle w radius 13
+        this.scale = 0.24; // sprite = circle w radius 13
 
         this.scene = scene;
 

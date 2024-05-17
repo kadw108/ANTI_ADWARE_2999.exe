@@ -1,5 +1,5 @@
 import Player from "./Player";
-import { EnemyAbstract, EnemyGroup } from "./Enemy";
+import { EnemyI, EnemyGroup } from "./Enemy";
 import { PlayerBullet, PlayerBulletGroup } from "./PlayerBullet";
 
 import {CONSTANTS} from "./CONSTANTS_FILE";
@@ -25,7 +25,7 @@ export default class GameMain extends Phaser.Scene {
         super("GameMain");
 
         // centerx, centery, width, height
-        this.rectangleLimit = [450, 500, 200, 100];
+        this.rectangleLimit = [CONSTANTS.originX, CONSTANTS.originY + 200, 200, 100];
     }
 
     preload() {
@@ -58,10 +58,10 @@ export default class GameMain extends Phaser.Scene {
         });
 
         // @ts-ignore
-        this.physics.add.overlap(this.player, this.enemyGroup, (player, enemy) => this.playerHitEnemy(player as Player, enemy as EnemyAbstract));
+        this.physics.add.overlap(this.player, this.enemyGroup, (player, enemy) => this.playerHitEnemy(player as Player, enemy as EnemyI));
         this.physics.add.overlap(this.playerBulletGroup, this.enemyGroup, (bullet, enemy) => {
             // @ts-ignore
-            this.playerBulletHitEnemy(bullet as PlayerBullet, enemy as EnemyAbstract);
+            this.playerBulletHitEnemy(bullet as PlayerBullet, enemy as EnemyI);
         });
 
         this.hpText = this.add.text(10, 20, "", { fontFamily: "DisplayFont", fontSize: 40, color: "#ffffff" });
@@ -77,7 +77,7 @@ export default class GameMain extends Phaser.Scene {
         this.performanceScoreText.setShadow(2, 2, "#66ccff", 4, true, false);
         this.updatePerformance();
 
-        this.performanceDecreaseEvent = this.time.addEvent({ delay: 50, loop: true, callback: () => {
+        this.performanceDecreaseEvent = this.time.addEvent({ delay: 80, loop: true, callback: () => {
             this.performanceScore -= 1;
             this.updatePerformance();
         }});
@@ -98,12 +98,12 @@ export default class GameMain extends Phaser.Scene {
         this.start();
     }
 
-    playerHitEnemy(player: Player, enemy: EnemyAbstract) {
+    playerHitEnemy(player: Player, enemy: EnemyI) {
         if (enemy.active) {
             enemy.onHitPlayer(player);
         }
     }
-    playerBulletHitEnemy(bullet: PlayerBullet, enemy: EnemyAbstract) {
+    playerBulletHitEnemy(bullet: PlayerBullet, enemy: EnemyI) {
         if (bullet.active && enemy.active && enemy.canHit) {
             bullet.kill();
             enemy.hit();

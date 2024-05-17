@@ -1,221 +1,8 @@
-import { CONSTANTS } from "./CONSTANTS_FILE";
 import GameMain from "./Game";
 import Player from "./Player";
+import { EnemyType, TextConfig } from "./EnemyGroup";
 
-type TextConfig = {
-    text: string;
-    fontSize: number;
-    showBackground?: boolean;
-};
-
-type ReleaseEvent = {
-    x: number;
-    y: number;
-    velocity: Phaser.Math.Vector2;
-    time: number;
-    type: string;
-    textConfig?: TextConfig;
-};
-
-type EnemyType = {
-    width: number;
-    height: number;
-    hp: number;
-    text?: true | undefined;
-};
-
-/*
-Function that turns ReleaseEvents, each for a single word/phrase, into 
-individual letter enemies.
-
-DOES NOT WORK WITH STRINGS CONTAINING UNICODE SPECIAL CHARACTERS DUE TO WIDTH (xadvance)
-TODO - if you want it to work, must dynamically get FONTWIDTH
-*/
-function generateLetterText(releaseEvents: Array<ReleaseEvent>): undefined | Array<ReleaseEvent> {
-    const results = [];
-
-    for (const releaseEvent of releaseEvents) {
-        if (releaseEvent.textConfig === undefined) {
-            console.error("generateLetterText running on event with undefined textConfig");
-            return undefined;
-        }
-        if (releaseEvent.type !== "word") {
-            console.log('Advise: run generateLetterText only on events with "word" type enemies.');
-        }
-
-        const FONTWIDTH = 29; // 29 is obtained from the 'xadvance' property in the bitmap xml file
-
-        // 29 is for a 72 height font; must adjust width for variable fontsizes
-        const sizeAdjustedWidth = FONTWIDTH * (releaseEvent.textConfig.fontSize / 72);
-
-        const real_starting_x = releaseEvent.x - (sizeAdjustedWidth * releaseEvent.textConfig.text.length) / 2;
-
-        for (let i = 0; i < releaseEvent.textConfig.text.length; i++) {
-            let newRelease: ReleaseEvent = {
-                x: real_starting_x + i * sizeAdjustedWidth,
-                y: releaseEvent.y,
-                velocity: releaseEvent.velocity,
-                time: releaseEvent.time,
-                type: "letter",
-                textConfig: { text: releaseEvent.textConfig.text[i], fontSize: releaseEvent.textConfig.fontSize },
-            };
-            results.push(newRelease);
-        }
-    }
-
-    return results;
-}
-
-function generateConfig(): Array<ReleaseEvent> {
-    let config: Array<ReleaseEvent> = [];
-
-    /*
-    config = [
-        { x: 400, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 1000, type: "0" },
-        { x: 400, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 2000, type: "0" },
-        { x: 500, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 3000, type: "0" },
-        { x: 500, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 4000, type: "0" },
-    ];
-    */
-
-    const letters = generateLetterText([
-        { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 1000, type: "word", textConfig: { text: "ARE YOU READY?", fontSize: 72 } },
-        { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 3000, type: "word", textConfig: { text: "GET SET", fontSize: 72 } },
-        { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 4000, type: "word", textConfig: { text: "GO!", fontSize: 72 } },
-    ]);
-    for (const i of letters!) {
-        config.push(i);
-    }
-
-    /*
-    for (let i = 0; i < 30; i++) {
-        config.push({ x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 720 * i, type: "wavy" });
-    }
-    */
-
-    const diag1 = ["✦", "✧"];
-    const diag2 = ["$", "€"];
-    for (let i = 0; i < 15; i++) {
-        for (let j = 0; j < 38; j++)  {
-            if (i % 2 === 0) {
-                config.push({ x: 0 + j * 25, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 22 * j, type: "letter", textConfig: {text: diag1[j % 2], fontSize: 30, showBackground: false}} );
-            }
-            else {
-                config.push({ x: CONSTANTS.width - j * 25, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 22 * j, type: "letter", textConfig: {text: diag2[j % 2], fontSize: 40, showBackground: false}} );
-            }
-        }
-    }
-
-    return config;
-}
-
-export class EnemyGroup extends Phaser.Physics.Arcade.Group {
-    config: Array<ReleaseEvent>;
-    typeList: { [id: string]: EnemyType };
-
-    constructor(scene: GameMain) {
-        super(scene.physics.world, scene);
-
-        this.typeList = {
-            "0": { width: 200, height: 75, hp: 2 },
-            "1": { width: 50, height: 50, hp: 1 },
-            "2": { width: 18, height: 18, hp: 1 },
-            "3": { width: CONSTANTS.width, height: 2, hp: 1 },
-            "wavy": { width: CONSTANTS.width, height: 9, hp: -1 },
-            word: { width: -1, height: -1, hp: 4, text: true },
-            letter: { width: -1, height: -1, hp: 1, text: true },
-        };
-
-        this.config = generateConfig();
-    }
-
-    start() {
-        for (const releaseEvent of this.config) {
-            this.scene.time.addEvent({
-                delay: releaseEvent.time,
-                callback: () => {
-                    this.release(releaseEvent.x, releaseEvent.y, releaseEvent.velocity, releaseEvent.type, releaseEvent.textConfig);
-                },
-            });
-        }
-    }
-
-    release(x: number, y: number, velocity: Phaser.Math.Vector2, enemyTypeKey: string, textConfig: TextConfig | undefined) {
-        const enemyType = this.typeList[enemyTypeKey];
-
-        if (enemyType.text === undefined) {
-            let newEnemy: Enemy;
-
-            this.getChildren().forEach((child) => {
-                if (!child.active && (child as Enemy).enemyType === enemyType) {
-                    //  We found a dead matching enemy, so resurrect it
-                    newEnemy = child as Enemy;
-                }
-            });
-
-            // @ts-ignore
-            if (newEnemy === undefined) {
-                if (enemyTypeKey !== "wavy") {
-                    newEnemy = new Enemy(this.scene as GameMain, enemyType);
-                }
-                else {
-                    newEnemy = new WavyEnemy(this.scene as GameMain, enemyType);
-                }
-
-                this.add(newEnemy);
-            }
-
-            newEnemy.start(x, y, velocity);
-
-        } else {
-            if (textConfig === undefined) {
-                console.error("Text config is undefined for text enemy!");
-                return;
-            }
-
-            let newEnemy: TextEnemy;
-
-            if (enemyTypeKey === "letter") {
-                this.getChildren().forEach((child) => {
-                    if (!child.active && (child as Enemy).enemyType === enemyType && (child as LetterEnemy).character === textConfig.text) {
-                        // We found a dead matching enemy, so resurrect it
-                        newEnemy = child as LetterEnemy;
-
-                        (newEnemy as LetterEnemy).restart(x, y, velocity, textConfig.fontSize);
-                    }
-                });
-
-                // @ts-ignore
-                if (newEnemy === undefined) {
-                    newEnemy = new LetterEnemy(this.scene as GameMain, enemyType, textConfig);
-                    this.add(newEnemy);
-                    newEnemy.start(x, y, velocity);
-                }
-            }
-            else {
-                newEnemy = new TextEnemy(this.scene as GameMain, enemyType, textConfig);
-                this.add(newEnemy);
-                newEnemy.start(x, y, velocity);
-            }
-        }
-    }
-
-    stop() {
-        // this.timedEvent.remove();
-
-        this.getChildren().forEach((child) => {
-            (child as EnemyAbstract).kill();
-        });
-    }
-
-    updateAll() {
-        this.getChildren().forEach((child) => {
-            (child as EnemyAbstract).update();
-        });
-    }
-}
-
-export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
+export interface EnemyI {
     scene: GameMain;
 
     dynamicBody: Phaser.Physics.Arcade.Body;
@@ -227,7 +14,29 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
 
     hitNum: number;
 
-    constructor(scene: GameMain, type: EnemyType) {
+    start(x: number, y: number, velocity: Phaser.Math.Vector2): void;
+    hit(): void;
+    onHitPlayer(player: Player): void;
+
+    /* stuff most gameobjects and sprites have */
+
+    active: boolean;
+}
+
+export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite implements EnemyI {
+    scene: GameMain;
+
+    dynamicBody: Phaser.Physics.Arcade.Body;
+    onWorldBounds: Function;
+
+    currentHp: number;
+    canHit: boolean;
+    enemyType: EnemyType;
+
+    hitNum: number;
+
+    // velocity needed so we can determine which wall the enemy SHOULDN'T be destroyed on contact with.
+    constructor(scene: GameMain, type: EnemyType, initialVelocity: Phaser.Math.Vector2) {
         super(scene, 0, 0, "squareSmall");
         this.scene = scene;
 
@@ -243,14 +52,37 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
 
         this.hitNum = 0;
 
+        this.addPhysics(initialVelocity);
+    }
+
+    addPhysics(initialVelocity: Phaser.Math.Vector2) {
         this.scene.physics.add.existing(this);
         // @ts-ignore
         this.dynamicBody = this.body as Phaser.Physics.Arcade.Body;
         this.dynamicBody.setCollideWorldBounds(true);
         this.dynamicBody.onWorldBounds = true;
+
+        const skipUp: boolean = initialVelocity.y > 0; // going down = don't kill when it hits upper edge
+        const skipDown: boolean = initialVelocity.y < 0; // going up = don't kill when it hits lower edge
+        const skipLeft: boolean = initialVelocity.x > 0; // going right = don't kill when it hits left edge
+        const skipRight: boolean = initialVelocity.x > 0; // going left = don't kill when it hits right edge
+
         this.onWorldBounds = function (up: boolean, down: boolean, left: boolean, right: boolean) {
-            if (up === false) {
-                this.kill(); // they spawn from up so don't kill there
+            if (up && !skipUp) {
+                this.kill(); 
+                console.log("kill up");
+            }
+            else if (down && !skipDown) {
+                this.kill();
+                console.log("kill down");
+            }
+            else if (left && !skipLeft) {
+                this.kill();
+                console.log("kill left");
+            }
+            else if (right && !skipRight) {
+                this.kill();
+                console.log("kill right");
             }
         };
         this.scene.add.existing(this);
@@ -270,8 +102,6 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
     }
 
     hit() {
-        console.log("hit", this.currentHp);
-
         this.currentHp -= 1;
 
         this.setTintFill(0xff0000);
@@ -301,18 +131,18 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
     }
 }
 
-class Enemy extends EnemyAbstract {
-    constructor(scene: GameMain, type: EnemyType) {
-        super(scene, type);
+export class Enemy extends EnemyAbstract {
+    constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
+        super(scene, type, velocity);
 
         this.scaleX = type.width;
         this.scaleY = type.height;
     }
 }
 
-class WavyEnemy extends EnemyAbstract {
-    constructor(scene: GameMain, type: EnemyType) {
-        super(scene, type);
+export class WavyEnemy extends EnemyAbstract {
+    constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
+        super(scene, type, velocity);
 
         this.play("wavy");
 
@@ -328,62 +158,120 @@ class WavyEnemy extends EnemyAbstract {
     }
 }
 
-class TextEnemy extends EnemyAbstract {
-    bitmapText: Phaser.GameObjects.BitmapText;
-    showBackground: boolean;
+export class TextEnemy extends Phaser.GameObjects.BitmapText implements EnemyI {
+    scene: GameMain;
 
-    constructor(scene: GameMain, type: EnemyType, textConfig: TextConfig) {
-        super(scene, type);
+    dynamicBody: Phaser.Physics.Arcade.Body;
+    onWorldBounds: Function;
 
-        if (textConfig.showBackground === undefined) {
-            this.showBackground = true;
-        }
-        else {
-            this.showBackground = textConfig.showBackground;
-        }
+    currentHp: number;
+    canHit: boolean;
+    enemyType: EnemyType;
 
-        this.bitmapText = new Phaser.GameObjects.BitmapText(scene, 0, 0, "DisplayFont", textConfig.text, textConfig.fontSize);
-        this.scene.add.existing(this.bitmapText);
+    hitNum: number;
+
+    constructor(scene: GameMain, type: EnemyType, textConfig: TextConfig, initialVelocity: Phaser.Math.Vector2) {
+        super(scene, 0, 0, "DisplayFont", textConfig.text, textConfig.fontSize);
+        this.scene.add.existing(this);
 
         this.setOrigin(0.5);
-        this.bitmapText.setOrigin(0.5);
 
-        this.scaleX = this.bitmapText.width;
-        this.scaleY = this.bitmapText.height;
+        // taken from EnemyAbstract
+        if (type.hp > 0) {
+            this.currentHp = type.hp;
+            this.canHit = true;
+        }
+        else {
+            this.currentHp = -1;
+            this.canHit = false;
+        }
+        this.enemyType = type;
 
-        this.setTintFill(0x0000ff);
+        this.hitNum = 0;
 
-        this.setDepth(0);
-        this.bitmapText.setDepth(1);
+        this.addPhysics(initialVelocity);
+    }
+
+    addPhysics(initialVelocity: Phaser.Math.Vector2) {
+        this.scene.physics.add.existing(this);
+        // @ts-ignore
+        this.dynamicBody = this.body as Phaser.Physics.Arcade.Body;
+        this.dynamicBody.setCollideWorldBounds(true);
+        this.dynamicBody.onWorldBounds = true;
+
+        const skipUp: boolean = initialVelocity.y > 0; // going down = don't kill when it hits upper edge
+        const skipDown: boolean = initialVelocity.y < 0; // going up = don't kill when it hits lower edge
+        const skipLeft: boolean = initialVelocity.x > 0; // going right = don't kill when it hits left edge
+        const skipRight: boolean = initialVelocity.x > 0; // going left = don't kill when it hits right edge
+
+        this.onWorldBounds = function (up: boolean, down: boolean, left: boolean, right: boolean) {
+            if (up && !skipUp) {
+                this.kill(); 
+                console.log("kill up");
+            }
+            else if (down && !skipDown) {
+                this.kill();
+                console.log("kill down");
+            }
+            else if (left && !skipLeft) {
+                this.kill();
+                console.log("kill left");
+            }
+            else if (right && !skipRight) {
+                this.kill();
+                console.log("kill right");
+            }
+        };
+        this.scene.add.existing(this);
     }
 
     start(x: number, y: number, velocity: Phaser.Math.Vector2) {
-        super.start(x, y, velocity);
-        if (!this.showBackground) {
-            this.setVisible(false);
-        }
+        this.dynamicBody.reset(x, y);
+        this.dynamicBody.setVelocity(velocity.x, velocity.y);
 
-        this.bitmapText.setActive(true);
-        this.bitmapText.setVisible(true);
+        this.setActive(true);
+        this.setVisible(true);
     }
 
     kill() {
-        this.bitmapText.destroy();
         this.destroy();
     }
 
-    update() {
-        super.update();
-        this.bitmapText.setX(this.x);
-        this.bitmapText.setY(this.y);
+    hit() {
+        this.currentHp -= 1;
+
+        this.setTintFill(0xff0000);
+        this.hitNum++;
+        this.scene.time.delayedCall(300, () => {
+            this.hitNum--;
+            if (this.hitNum === 0) {
+                this.clearHit();
+            }
+        });
+
+        if (this.currentHp <= 0) {
+            this.scene.sound.play("sfxDestroy2");
+            this.kill();
+        }
+        else {
+            this.scene.sound.play("sfxDestroy");
+        }
+    }
+
+    clearHit() {
+        this.clearTint();
+    }
+
+    onHitPlayer(player: Player): void {
+        player.hit();
     }
 }
 
-class LetterEnemy extends TextEnemy {
+export class LetterEnemy extends TextEnemy {
     character: string;
 
-    constructor(scene: GameMain, type: EnemyType, textConfig: TextConfig) {
-        super(scene, type, textConfig);
+    constructor(scene: GameMain, type: EnemyType, textConfig: TextConfig, velocity: Phaser.Math.Vector2) {
+        super(scene, type, textConfig, velocity);
 
         this.character = textConfig.text;
         if (this.character.length !== 1) {
@@ -394,23 +282,11 @@ class LetterEnemy extends TextEnemy {
 
     restart(x: number, y: number, velocity: Phaser.Math.Vector2, fontSize: number) {
         super.start(x, y, velocity);
-        if (!this.showBackground) {
-            this.setVisible(false);
-        }
-
-        this.bitmapText.setFontSize(fontSize);
-        this.scaleX = this.bitmapText.width;
-        this.scaleY = this.bitmapText.height;
+        this.setFontSize(fontSize);
     }
 
     kill() {
         this.setActive(false);
         this.setVisible(false);
-        this.bitmapText.setActive(false);
-        this.bitmapText.setVisible(false);
-    }
-
-    clearHit() {
-        this.setTintFill(0x0000ff);
     }
 }

@@ -40,7 +40,7 @@ export class PlayerBullet extends Phaser.Physics.Arcade.Sprite
     constructor (scene: Phaser.Scene, x: number, y: number)
     {
         super(scene, x, y, 'circle');
-        this.scale = 0.1;
+        this.scale = 0.2;
 
         scene.physics.add.existing(this);
         // @ts-ignore

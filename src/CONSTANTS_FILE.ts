@@ -1,5 +1,5 @@
-const WIDTH = 900;
-const HEIGHT = 700;
+const WIDTH = 700;
+const HEIGHT = 600;
 
 export const CONSTANTS = {
     width: WIDTH,
