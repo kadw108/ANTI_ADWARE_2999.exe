@@ -41,6 +41,7 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite impleme
     // velocity needed so we can determine which wall the enemy SHOULDN'T be destroyed on contact with.
     constructor(scene: GameMain, type: EnemyType, initialVelocity: Phaser.Math.Vector2, hp?: number) {
         super(scene, 0, 0, "squareSmall");
+        this.setOrigin(0.5);
         this.scene = scene;
 
         if (hp !== undefined) {
@@ -232,6 +233,7 @@ export class TextEnemy extends EnemyAbstract {
         super(scene, type, initialVelocity, hp);
 
         this.bitmapText = new Phaser.GameObjects.BitmapText(scene, 0, 0, "DisplayFont", textConfig.text, textConfig.fontSize);
+        this.bitmapText.setOrigin(0.5);
         scene.add.existing(this.bitmapText);
 
         this.setScale(this.bitmapText.width, this.bitmapText.height);
@@ -274,6 +276,7 @@ export class LetterEnemy extends TextEnemy {
     restart(x: number, y: number, velocity: Phaser.Math.Vector2, fontSize: number) {
         super.start(x, y, velocity);
         this.bitmapText.setFontSize(fontSize);
+        this.setScale(this.bitmapText.width, this.bitmapText.height);
     }
 
     kill() {
@@ -281,152 +284,8 @@ export class LetterEnemy extends TextEnemy {
         this.bitmapText.setVisible(false);
         this.setActive(false);
     }
-}
-
-/*
-export class TextEnemy extends Phaser.GameObjects.BitmapText implements EnemyI {
-    scene: GameMain;
-
-    dynamicBody: Phaser.Physics.Arcade.Body;
-    onWorldBounds: Function;
-
-    currentHp: number;
-    maxHp: number;
-    canHit: boolean;
-    enemyType: EnemyType;
-
-    hitNum: number;
-
-    constructor(scene: GameMain, type: EnemyType, textConfig: TextConfig, initialVelocity: Phaser.Math.Vector2, hp?: number) {
-        super(scene, 0, 0, "DisplayFont", textConfig.text, textConfig.fontSize);
-
-        // taken from EnemyAbstract
-        if (hp !== undefined) {
-            this.setHp(hp);
-        } else {
-            this.setHp(type.hp);
-        }
-
-        this.enemyType = type;
-
-        this.scene.add.existing(this);
-        this.scene.physics.add.existing(this);
-        // @ts-ignore
-        this.dynamicBody = this.body as Phaser.Physics.Arcade.Body;
-
-        // this.addCollision(initialVelocity);
-        // this.establishCollision(initialVelocity);
-    }
-
-    setHp(hp: number) {
-        if (hp > 0) {
-            this.maxHp = hp;
-            this.canHit = true;
-        } else {
-            this.maxHp = -1;
-            this.canHit = false;
-        }
-        this.currentHp = this.maxHp;
-    }
-
-    establishCollision(initialVelocity: Phaser.Math.Vector2) {
-        const skipUp: boolean = initialVelocity.y > 0; // going down = don't kill when it hits upper edge
-        const skipDown: boolean = initialVelocity.y < 0; // going up = don't kill when it hits lower edge
-        const skipLeft: boolean = initialVelocity.x > 0; // going right = don't kill when it hits left edge
-        const skipRight: boolean = initialVelocity.x > 0; // going left = don't kill when it hits right edge
-        this.onWorldBounds = function (up: boolean, down: boolean, left: boolean, right: boolean) {
-            if (up && !skipUp) {
-                this.kill();
-                console.log("kill up");
-            } else if (down && !skipDown) {
-                this.kill();
-                console.log("kill down");
-            } else if (left && !skipLeft) {
-                this.kill();
-                console.log("kill left");
-            } else if (right && !skipRight) {
-                this.kill();
-                console.log("kill right");
-            }
-        };
-    }
-
-    addCollision() {
-        this.dynamicBody.setCollideWorldBounds(true, 0, 0, true);
-    }
-
-    start(x: number, y: number, velocity: Phaser.Math.Vector2) {
-        this.currentHp = this.maxHp;
-        this.hitNum = 0;
-        this.clearHit();
-
-        this.dynamicBody.reset(x, y);
-        this.dynamicBody.setVelocity(velocity.x, velocity.y);
-
-        this.setActive(true);
-        this.setVisible(true);
-    }
-
-    kill() {
-        this.destroy();
-    }
-
-    hit() {
-        this.currentHp -= 1;
-
-        if (this.currentHp <= 0) {
-            this.scene.sound.play("sfxDestroy2");
-            this.kill();
-
-        } else {
-            this.setTintFill(0xff0000);
-            this.hitNum++;
-            this.scene.time.delayedCall(300, () => {
-                this.hitNum--;
-                if (this.hitNum === 0) {
-                    this.clearHit();
-                }
-            });
-
-            this.scene.sound.play("sfxDestroy");
-        }
-    }
-
-    clearHit() {
-        this.clearTint();
-    }
-
-    onHitPlayer(player: Player): void {
-        player.hit();
-    }
-
-    update() {
-
-    }
-}
-
-export class LetterEnemy extends TextEnemy {
-    constructor(scene: GameMain, type: EnemyType, textConfig: TextConfig, velocity: Phaser.Math.Vector2) {
-        super(scene, type, textConfig, velocity);
-
-        if (textConfig.text.length !== 1) {
-            console.error("Character length of LetterEnemy is not 1!");
-            console.error(textConfig);
-        }
-    }
-
-    restart(x: number, y: number, velocity: Phaser.Math.Vector2, fontSize: number) {
-        super.start(x, y, velocity);
-        this.setFontSize(fontSize);
-    }
 
     hit() {
         super.hit();
     }
-
-    kill() {
-        this.setActive(false);
-        this.setVisible(false);
-    }
 }
-*/
