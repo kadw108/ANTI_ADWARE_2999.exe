@@ -91,7 +91,6 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite impleme
     }
 
     hit() {
-
         this.currentHp -= 1;
 
         if (this.currentHp <= 0) {
@@ -183,7 +182,7 @@ export class CircleEnemy extends EnemyAbstract {
     constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
         super(scene, type, velocity);
 
-        this.setTexture('circle')
+        this.setTexture("circle");
 
         this.scale = type.width / 50;
         this.setCircle(type.width);
@@ -191,7 +190,6 @@ export class CircleEnemy extends EnemyAbstract {
 }
 
 export class BoomerangEnemy extends Enemy {
-
     stayTime: number;
     stayEvent: Phaser.Time.TimerEvent | null;
 
@@ -269,7 +267,6 @@ export class TextEnemy extends EnemyAbstract {
 }
 
 export class LetterEnemy extends TextEnemy {
-
     constructor(scene: GameMain, type: EnemyType, textConfig: TextConfig, initialVelocity: Phaser.Math.Vector2, hp?: number) {
         super(scene, type, textConfig, initialVelocity, hp);
 

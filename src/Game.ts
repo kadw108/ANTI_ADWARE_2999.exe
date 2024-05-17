@@ -3,7 +3,7 @@ import { EnemyI } from "./Enemy";
 import { EnemyGroup } from "./EnemyGroup";
 import { PlayerBullet, PlayerBulletGroup } from "./PlayerBullet";
 
-import {CONSTANTS} from "./CONSTANTS_FILE";
+import { CONSTANTS } from "./CONSTANTS_FILE";
 
 export default class GameMain extends Phaser.Scene {
     // player: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
@@ -75,22 +75,26 @@ export default class GameMain extends Phaser.Scene {
         this.performanceScoreText.setShadow(2, 2, "#66ccff", 4, true, false);
         this.updatePerformance();
 
-        this.performanceDecreaseEvent = this.time.addEvent({ delay: 80, loop: true, callback: () => {
-            this.performanceScore -= 1;
-            this.updatePerformance();
-        }});
+        this.performanceDecreaseEvent = this.time.addEvent({
+            delay: 80,
+            loop: true,
+            callback: () => {
+                this.performanceScore -= 1;
+                this.updatePerformance();
+            },
+        });
 
         const gameOverRect = this.add.rectangle(CONSTANTS.originX, CONSTANTS.originY, CONSTANTS.width, CONSTANTS.height, 0x0000ff);
         gameOverRect.depth = 4;
-        const gameOverText = this.add.text(CONSTANTS.originX, CONSTANTS.originY, "Game Over", {fontFamily: "DisplayFont", fontSize: 70, color: "#ffffff"});
+        const gameOverText = this.add.text(CONSTANTS.originX, CONSTANTS.originY, "Game Over", { fontFamily: "DisplayFont", fontSize: 70, color: "#ffffff" });
         gameOverText.setOrigin(0.5, 0.5);
         gameOverText.depth = 5;
-        const subtitle = this.add.text(CONSTANTS.originX, CONSTANTS.originY + 60, "Click to Restart", {fontFamily: "DisplayFont", fontSize: 40, color: "#ffffff"});
+        const subtitle = this.add.text(CONSTANTS.originX, CONSTANTS.originY + 60, "Click to Restart", { fontFamily: "DisplayFont", fontSize: 40, color: "#ffffff" });
         subtitle.setOrigin(0.5, 0.5);
         this.gameOverGroup = this.add.group([gameOverRect, gameOverText, subtitle]);
         this.gameOverGroup.setVisible(false);
 
-        const wearyWillow = this.sound.add('wearyWillow', { loop: true, delay: 10 });
+        const wearyWillow = this.sound.add("wearyWillow", { loop: true, delay: 10 });
         wearyWillow.play();
 
         this.start();
@@ -114,7 +118,7 @@ export default class GameMain extends Phaser.Scene {
     }
 
     updatePerformance(): void {
-        this.performanceScoreText.text = "Employee Performance: "  + this.performanceScore;
+        this.performanceScoreText.text = "Employee Performance: " + this.performanceScore;
     }
 
     update(): void {
@@ -138,11 +142,8 @@ export default class GameMain extends Phaser.Scene {
 
         this.gameOverGroup.setVisible(true);
 
-        this.input.once(
-            "pointerdown",
-            () => {
-                this.scene.start("Menu");
-            },
-        );
+        this.input.once("pointerdown", () => {
+            this.scene.start("Menu");
+        });
     }
 }

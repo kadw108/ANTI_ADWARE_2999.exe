@@ -89,7 +89,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             word: { width: -1, height: -1, hp: 4, text: true },
             letter: { width: -1, height: -1, hp: 1, text: true },
             boomerang: { width: 75, height: 75, hp: 999 },
-            circle: { width: 10, height: -1, hp: -1}, // height doesn't matter
+            circle: { width: 10, height: -1, hp: -1 }, // height doesn't matter
         };
 
         this.config = generateConfig();
@@ -126,8 +126,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
                 newEnemy = new WavyEnemy(this.scene as GameMain, enemyType, velocity);
             } else if (enemyTypeKey === "boomerang") {
                 newEnemy = new BoomerangEnemy(this.scene as GameMain, enemyType, velocity, boomerangConfig!);
-            }
-            else if (enemyTypeKey === "circle") {
+            } else if (enemyTypeKey === "circle") {
                 newEnemy = new CircleEnemy(this.scene as GameMain, enemyType, velocity);
             } else {
                 newEnemy = new Enemy(this.scene as GameMain, enemyType, velocity);
@@ -135,7 +134,6 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
 
             this.add(newEnemy as unknown as Phaser.GameObjects.GameObject);
             newEnemy.start(x, y, velocity);
-
         } else if (enemyType.text !== undefined && newEnemy === undefined) {
             if (enemyTypeKey === "letter") {
                 newEnemy = new LetterEnemy(this.scene as GameMain, enemyType, textConfig!, velocity);
@@ -159,8 +157,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
 
                     if (enemyTypeKey === "boomerang") {
                         (newEnemy as BoomerangEnemy).start(x, y, velocity, boomerangConfig);
-                    }
-                    else {
+                    } else {
                         (newEnemy as Enemy).start(x, y, velocity);
                     }
                     return newEnemy;

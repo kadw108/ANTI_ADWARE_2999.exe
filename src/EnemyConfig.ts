@@ -29,12 +29,11 @@ export function generateConfig(): Array<ReleaseEvent> {
     const diag1 = ["✦", "✧"];
     const diag2 = ["$", "€"];
     for (let i = 0; i < 13; i++) {
-        for (let j = 0; j < 20; j++)  {
+        for (let j = 0; j < 20; j++) {
             if (i % 2 === 0) {
-                config.push({ x: 0 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 26 * j, type: "letter", textConfig: {text: diag1[j % 2], fontSize: 35}} );
-            }
-            else {
-                config.push({ x: CONSTANTS.width - j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 26 * j, type: "letter", textConfig: {text: diag2[j % 2], fontSize: 60}} );
+                config.push({ x: 0 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 26 * j, type: "letter", textConfig: { text: diag1[j % 2], fontSize: 35 } });
+            } else {
+                config.push({ x: CONSTANTS.width - j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 26 * j, type: "letter", textConfig: { text: diag2[j % 2], fontSize: 60 } });
             }
         }
     }
@@ -42,12 +41,11 @@ export function generateConfig(): Array<ReleaseEvent> {
     // coming from left
     const diag3 = ["Y", "U", "B"];
     for (let i = 0; i < 11; i++) {
-        for (let j = 0; j < 3; j++)  {
+        for (let j = 0; j < 3; j++) {
             if (i % 2 === 0) {
-                config.push({ x: -50, y: 475, velocity: new Phaser.Math.Vector2(200, 0), time: 7880 + 1440 * i + HOR_SPACING * j, type: "letter", textConfig: {text: diag2[j % 2], fontSize: HOR_FONTSIZE, }} );
-            }
-            else {
-                config.push({ x: -50, y: 525, velocity: new Phaser.Math.Vector2(200, 0), time: 7880 + 1440 * i + HOR_SPACING * j, type: "letter", textConfig: {text: diag3[j % 3], fontSize: HOR_FONTSIZE, }} );
+                config.push({ x: -50, y: 475, velocity: new Phaser.Math.Vector2(200, 0), time: 7880 + 1440 * i + HOR_SPACING * j, type: "letter", textConfig: { text: diag2[j % 2], fontSize: HOR_FONTSIZE } });
+            } else {
+                config.push({ x: -50, y: 525, velocity: new Phaser.Math.Vector2(200, 0), time: 7880 + 1440 * i + HOR_SPACING * j, type: "letter", textConfig: { text: diag3[j % 3], fontSize: HOR_FONTSIZE } });
             }
         }
     }
@@ -59,12 +57,11 @@ export function generateConfig(): Array<ReleaseEvent> {
     // coming from right
     const diag4 = ["B", "U", "Y"];
     for (let i = 0; i < 5; i++) {
-        for (let j = 0; j < 3; j++)  {
+        for (let j = 0; j < 3; j++) {
             if (i % 2 === 0) {
-                config.push({ x: CONSTANTS.width + 50, y: 475, velocity: new Phaser.Math.Vector2(-200, 0), time: 35960 + 1440 * i + HOR_SPACING * j, type: "letter", textConfig: {text: diag2[j % 2], fontSize: HOR_FONTSIZE, }} );
-            }
-            else {
-                config.push({ x: CONSTANTS.width + 50, y: 525, velocity: new Phaser.Math.Vector2(-200, 0), time: 35960 + 1440 * i + HOR_SPACING * j, type: "letter", textConfig: {text: diag4[j % 3], fontSize: HOR_FONTSIZE, }} );
+                config.push({ x: CONSTANTS.width + 50, y: 475, velocity: new Phaser.Math.Vector2(-200, 0), time: 35960 + 1440 * i + HOR_SPACING * j, type: "letter", textConfig: { text: diag2[j % 2], fontSize: HOR_FONTSIZE } });
+            } else {
+                config.push({ x: CONSTANTS.width + 50, y: 525, velocity: new Phaser.Math.Vector2(-200, 0), time: 35960 + 1440 * i + HOR_SPACING * j, type: "letter", textConfig: { text: diag4[j % 3], fontSize: HOR_FONTSIZE } });
             }
         }
     }
@@ -73,38 +70,61 @@ export function generateConfig(): Array<ReleaseEvent> {
     // const SPACE1 = 2760;
     const SPACE1 = 1000;
     config.push({
-        x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: START1, type: "boomerang", boomerangConfig: {stayTime: 1000, reverseTime: 9000}
+        x: CONSTANTS.originX,
+        y: -50,
+        velocity: new Phaser.Math.Vector2(0, 200),
+        time: START1,
+        type: "boomerang",
+        boomerangConfig: { stayTime: 1000, reverseTime: 9000 },
     });
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 20; j++) {
             if (j % 2 == 0) {
                 config.push({
-                    x: CONSTANTS.originX, y: 200, velocity: new Phaser.Math.Vector2(100 - j * 10, 200), time: START1 + SPACE1 + i * 720 + j * 72, type: "circle"
+                    x: CONSTANTS.originX,
+                    y: 200,
+                    velocity: new Phaser.Math.Vector2(100 - j * 10, 200),
+                    time: START1 + SPACE1 + i * 720 + j * 72,
+                    type: "circle",
                 });
-            }
-            else {
+            } else {
                 config.push({
-                    x: CONSTANTS.originX, y: 200, velocity: new Phaser.Math.Vector2(-100 + j * 10, 200), time: START1 + SPACE1 + i * 720 + j * 72, type: "circle"
+                    x: CONSTANTS.originX,
+                    y: 200,
+                    velocity: new Phaser.Math.Vector2(-100 + j * 10, 200),
+                    time: START1 + SPACE1 + i * 720 + j * 72,
+                    type: "circle",
                 });
             }
         }
     }
 
-
     const START2 = 53608;
     config.push({
-        x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: START2, type: "boomerang", boomerangConfig: {stayTime: 1000, reverseTime: 9000}
+        x: CONSTANTS.originX,
+        y: -50,
+        velocity: new Phaser.Math.Vector2(0, 200),
+        time: START2,
+        type: "boomerang",
+        boomerangConfig: { stayTime: 1000, reverseTime: 9000 },
     });
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 20; j++) {
             if (j % 2 == 0) {
                 config.push({
-                    x: CONSTANTS.originX, y: 200, velocity: new Phaser.Math.Vector2(100 - j * 10, 200), time: START2 + SPACE1 + 2760 + i * 720 + j * 72, type: "circle"
+                    x: CONSTANTS.originX,
+                    y: 200,
+                    velocity: new Phaser.Math.Vector2(100 - j * 10, 200),
+                    time: START2 + SPACE1 + 2760 + i * 720 + j * 72,
+                    type: "circle",
                 });
-            }
-            else {
+            } else {
                 config.push({
-                    x: CONSTANTS.originX, y: 200, velocity: new Phaser.Math.Vector2(-100 + j * 10, 200), time: START2 + SPACE1 + 2760 + i * 720 + j * 72, type: "circle"
+                    x: CONSTANTS.originX,
+                    y: 200,
+                    velocity: new Phaser.Math.Vector2(-100 + j * 10, 200),
+                    time: START2 + SPACE1 + 2760 + i * 720 + j * 72,
+                    type: "circle",
                 });
             }
         }
