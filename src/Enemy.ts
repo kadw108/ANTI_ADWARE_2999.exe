@@ -78,6 +78,8 @@ function generateConfig(): Array<ReleaseEvent> {
         { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 1000, type: "word", textConfig: { text: "ARE YOU READY?", fontSize: 72 } },
         { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 3000, type: "word", textConfig: { text: "GET SET", fontSize: 72 } },
         { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 4000, type: "word", textConfig: { text: "GO!", fontSize: 72 } },
+
+        { x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 7000, type: "word", textConfig: { text: "TEST LMAO. GET SET GO", fontSize: 72 } },
     ]);
 
     for (const i of letters!) {
@@ -132,8 +134,6 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
                 if (!child.active && (child as Enemy).enemyType === enemyType) {
                     //  We found a dead matching enemy, so resurrect it
                     newEnemy = child as Enemy;
-
-                    console.log("normal enemy resurrected");
                 }
             });
 
@@ -161,19 +161,22 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
 
             if (enemyTypeKey === "letter") {
                 this.getChildren().forEach((child) => {
-                    console.log(!child.active, (child as Enemy).enemyType === enemyType, (child as LetterEnemy).character === textConfig.text);
                     if (!child.active && (child as Enemy).enemyType === enemyType && (child as LetterEnemy).character === textConfig.text) {
                         // We found a dead matching enemy, so resurrect it
                         newEnemy = child as LetterEnemy;
 
-                        console.log("letter enemy resurrected");
-
                         (newEnemy as LetterEnemy).restart(x, y, velocity, textConfig.fontSize);
                     }
                 });
+
+                // @ts-ignore
+                if (newEnemy === undefined) {
+                    newEnemy = new LetterEnemy(this.scene as GameMain, enemyType, textConfig);
+                    this.add(newEnemy);
+                    newEnemy.start(x, y, velocity);
+                }
             }
-            // @ts-ignore
-            if (newEnemy === undefined) {
+            else {
                 newEnemy = new TextEnemy(this.scene as GameMain, enemyType, textConfig);
                 this.add(newEnemy);
                 newEnemy.start(x, y, velocity);
@@ -357,6 +360,8 @@ class LetterEnemy extends TextEnemy {
 
     restart(x: number, y: number, velocity: Phaser.Math.Vector2, fontSize: number) {
         super.start(x, y, velocity);
+
+        this.setTintFill(0x0000ff);
 
         this.bitmapText.setFontSize(fontSize);
         this.scaleX = this.bitmapText.width;
