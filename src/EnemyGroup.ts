@@ -134,7 +134,6 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             }
 
             this.add(newEnemy as unknown as Phaser.GameObjects.GameObject);
-            // newEnemy.addCollision(velocity);
             newEnemy.start(x, y, velocity);
 
         } else if (enemyType.text !== undefined && newEnemy === undefined) {
@@ -145,8 +144,6 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             }
 
             this.add(newEnemy as unknown as Phaser.GameObjects.GameObject);
-            // newEnemy.addCollision(velocity);
-
             newEnemy.start(x, y, velocity);
         }
     }

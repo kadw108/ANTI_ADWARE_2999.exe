@@ -1,6 +1,7 @@
 import GameMain from "./Game";
 import Player from "./Player";
 import { EnemyType, TextConfig, BoomerangConfig } from "./EnemyGroup";
+import { CONSTANTS } from "./CONSTANTS_FILE";
 
 export interface EnemyI {
     scene: GameMain;
@@ -18,7 +19,6 @@ export interface EnemyI {
     hit(): void;
     onHitPlayer(player: Player): void;
     kill(): void;
-    addCollision(velocity: Phaser.Math.Vector2): void;
 
     /* stuff most gameobjects and sprites have */
 
@@ -37,6 +37,8 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite impleme
     enemyType: EnemyType;
 
     hitNum: number;
+
+    skipCollision: [boolean, boolean, boolean, boolean]; // whether to skip collision: up down left right
 
     // velocity needed so we can determine which wall the enemy SHOULDN'T be destroyed on contact with.
     constructor(scene: GameMain, type: EnemyType, initialVelocity: Phaser.Math.Vector2, hp?: number) {
@@ -57,8 +59,7 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite impleme
         // @ts-ignore
         this.dynamicBody = this.body as Phaser.Physics.Arcade.Body;
 
-        // this.addCollision(initialVelocity);
-        // this.establishCollision(initialVelocity);
+        this.skipCollision = [initialVelocity.y > 0, initialVelocity.y < 0, initialVelocity.x > 0, initialVelocity.x > 0];
     }
 
     setHp(hp: number) {
@@ -70,33 +71,6 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite impleme
             this.canHit = false;
         }
         this.currentHp = this.maxHP;
-    }
-
-    establishCollision(initialVelocity: Phaser.Math.Vector2) {
-        const skipUp: boolean = initialVelocity.y > 0; // going down = don't kill when it hits upper edge
-        const skipDown: boolean = initialVelocity.y < 0; // going up = don't kill when it hits lower edge
-        const skipLeft: boolean = initialVelocity.x > 0; // going right = don't kill when it hits left edge
-        const skipRight: boolean = initialVelocity.x > 0; // going left = don't kill when it hits right edge
-        this.onWorldBounds = function (up: boolean, down: boolean, left: boolean, right: boolean) {
-            if (up && !skipUp) {
-                this.kill();
-                console.log("kill up");
-            } else if (down && !skipDown) {
-                this.kill();
-                console.log("kill down");
-            } else if (left && !skipLeft) {
-                this.kill();
-                console.log("kill left");
-            } else if (right && !skipRight) {
-                this.kill();
-                console.log("kill right");
-            }
-        };
-    }
-
-    addCollision() {
-        this.dynamicBody.setCollideWorldBounds(true);
-        this.dynamicBody.onWorldBounds = true;
     }
 
     start(x: number, y: number, velocity: Phaser.Math.Vector2) {
@@ -143,6 +117,38 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite impleme
 
     onHitPlayer(player: Player): void {
         player.hit();
+    }
+
+    checkWithinWorldBounds(): void {
+        const GRACE_AREA = 100;
+
+        const collideUp = this.y < 0 - GRACE_AREA;
+        if (collideUp && !this.skipCollision[0]) {
+            this.kill();
+            return;
+        }
+
+        const collideDown = this.y > CONSTANTS.height + GRACE_AREA;
+        if (collideDown && !this.skipCollision[1]) {
+            this.kill();
+            return;
+        }
+
+        const collideLeft = this.x < 0 - GRACE_AREA;
+        if (collideLeft && !this.skipCollision[2]) {
+            this.kill();
+            return;
+        }
+
+        const collideRight = this.x > CONSTANTS.width + GRACE_AREA;
+        if (collideRight && !this.skipCollision[3]) {
+            this.kill();
+            return;
+        }
+    }
+
+    update() {
+        this.checkWithinWorldBounds();
     }
 }
 
