@@ -97,10 +97,6 @@ export function generateConfig(): Array<ReleaseEvent> {
         config.push({ x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 23720 + 720 * i, type: "wavy" });
     }
 
-    for (let i = 0; i < 28; i++) {
-        config.push({ x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 0 + 720 * i, type: "wavy" });
-    }
-
     // coming from right
     const diag4 = ["B", "U", "Y"];
     for (let i = 0; i < 5; i++) {
@@ -181,7 +177,7 @@ export function generateConfig(): Array<ReleaseEvent> {
         config.push({ x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: START3 + 90 * i, type: "wavy" });
     }
 
-    const START4 = 64170;
+    const START4 = 65610;
     const SPACE2 = 2500;
     config.push({
         x: CONSTANTS.originX + 60,
@@ -203,19 +199,24 @@ export function generateConfig(): Array<ReleaseEvent> {
     });
 
 
-    const START5 = 66240;
+    const START5 = 67680;
     for (let i = 0; i < 3; i++) {
         for (let j = 0; j < 4; j++) {
             config.push({
-                x: CONSTANTS.originX - 100 + j * 50,
+                x: CONSTANTS.originX - 100 + j * 50 + 35/2,
                 y: -50,
                 velocity: new Phaser.Math.Vector2(0, 200),
-                time: START5 + i * 2880,
+                time: START5 + i * 5760,
                 type: "boomerang",
                 enemyConfig: {height: 35, width: 35, hp: 1},
                 boomerangConfig: { stayTime: SPACE2, reverseTime: 720, fireMissile: 5 },
             });
         }
+    }
+
+    const START6 = 70000;
+    for (let i = 0; i < 10; i++) {
+        config.push({ x: -50, y: CONSTANTS.originY, velocity: new Phaser.Math.Vector2(200, 0), time: START6 + 720 * i, type: "blocky", enemyConfig: {counterClockwise: 1} });
     }
 
     return config;

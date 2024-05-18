@@ -172,22 +172,22 @@ export class Enemy extends EnemyAbstract {
 }
 
 export class LineEnemy extends EnemyAbstract {
-    constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
-        super(scene, type, velocity);
-
-        // don't want to set scale because that affects image/anim size, so just
-        // set size of body
-        this.dynamicBody.setSize(type.width, type.height);
-    }
-
     start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig) {
         super.start(x, y, initialVelocity, enemyConfig);
 
-        if (enemyConfig !== undefined) {
-            if (enemyConfig.width !== undefined && enemyConfig.height !== undefined) {
-                this.dynamicBody.setSize(enemyConfig.width, enemyConfig.height);
-            }
+        // IMPORTANT: dynamicBody.setSize must be called after this.play(animation)
+        // otherwise the collision breaks completely
+        // I don't know why?
+        if (enemyConfig !== undefined && enemyConfig.width !== undefined && enemyConfig.height !== undefined) {
+            this.dynamicBody.setSize(enemyConfig.width, enemyConfig.height);
+        }
+        else {
+            // don't want to set scale because that affects image/anim size, so just
+            // set size of body
+            this.dynamicBody.setSize(this.enemyType.width, this.enemyType.height);
+        }
 
+        if (enemyConfig !== undefined) {
             if (enemyConfig.counterClockwise !== undefined) {
                 switch (enemyConfig.counterClockwise % 4) {
                     case 0:
@@ -195,7 +195,9 @@ export class LineEnemy extends EnemyAbstract {
                         break;
                     case 1:
                     case 3:
-                        this.dynamicBody.setSize(this.dynamicBody.height, this.dynamicBody.width);
+                        const newHeight = this.dynamicBody.width;
+                        const newWidth = this.dynamicBody.height;
+                        this.dynamicBody.setSize(newWidth, newHeight);
                         break;
                 }
             }
