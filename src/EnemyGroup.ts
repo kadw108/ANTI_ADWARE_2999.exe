@@ -1,6 +1,6 @@
 import { CONSTANTS } from "./CONSTANTS_FILE";
 import { EnemyI, Enemy, WavyEnemy, LetterEnemy, TextEnemy, BoomerangEnemy, CircleEnemy } from "./Enemy";
-import { generateConfig } from "./EnemyConfig";
+import { generateConfig } from "./EnemyPatternConfig";
 import GameMain from "./Game";
 
 export type TextConfig = {
@@ -11,8 +11,8 @@ export type TextConfig = {
 export type BoomerangConfig = {
     stayTime: number;
     reverseTime: number; // additive onto stayTime, i.e. relative not absolute
-    newVelocity?: Phaser.Math.Vector2 | undefined; // if undefined, it's the reverse of the original velocity,
-    fireMissile?: number | undefined; // number of missiles enemy should fire at player while unmoving; undefined = 0
+    newVelocity?: Phaser.Math.Vector2; // if undefined, it's the reverse of the original velocity,
+    fireMissile?: number; // number of missiles enemy should fire at player while unmoving; undefined = 0
 };
 
 export type EnemyType = {
@@ -22,13 +22,19 @@ export type EnemyType = {
     text?: true | undefined;
 };
 
+export type EnemyConfig = {
+    width?: number;
+    height?: number;
+    hp?: number;
+}
+
 export type ReleaseEvent = {
     x: number;
     y: number;
     velocity: Phaser.Math.Vector2;
     time: number;
     type: string;
-    hp?: number | undefined;
+    enemyConfig?: EnemyConfig; // can override default enemy settings for that type
     textConfig?: TextConfig;
     boomerangConfig?: BoomerangConfig;
 };
@@ -61,13 +67,13 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             this.scene.time.addEvent({
                 delay: releaseEvent.time,
                 callback: () => {
-                    this.release(releaseEvent.x, releaseEvent.y, releaseEvent.velocity, releaseEvent.type, releaseEvent.textConfig, releaseEvent.boomerangConfig);
+                    this.release(releaseEvent.x, releaseEvent.y, releaseEvent.velocity, releaseEvent.type, releaseEvent.enemyConfig, releaseEvent.textConfig, releaseEvent.boomerangConfig);
                 },
             });
         }
     }
 
-    release(x: number, y: number, velocity: Phaser.Math.Vector2, enemyTypeKey: string, textConfig: TextConfig | undefined, boomerangConfig: BoomerangConfig | undefined): void {
+    release(x: number, y: number, velocity: Phaser.Math.Vector2, enemyTypeKey: string, enemyConfig: EnemyConfig | undefined, textConfig: TextConfig | undefined, boomerangConfig: BoomerangConfig | undefined): void {
         const enemyType = this.typeList[enemyTypeKey];
 
         if (enemyType.text !== undefined) {
@@ -85,7 +91,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             return;
         }
 
-        if (this.resurrectEnemy(x, y, velocity, enemyTypeKey, textConfig!, boomerangConfig!)) {
+        if (this.resurrectEnemy(x, y, velocity, enemyTypeKey, enemyConfig, textConfig!, boomerangConfig!)) {
             return;
         }
 
@@ -121,7 +127,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
         }
     }
 
-    resurrectEnemy(x: number, y: number, velocity: Phaser.Math.Vector2, enemyTypeKey: string, textConfig: TextConfig, boomerangConfig: BoomerangConfig): boolean {
+    resurrectEnemy(x: number, y: number, velocity: Phaser.Math.Vector2, enemyTypeKey: string, enemyConfig: EnemyConfig | undefined, textConfig: TextConfig, boomerangConfig: BoomerangConfig): boolean {
         const enemyType = this.typeList[enemyTypeKey];
 
         if (enemyType.text === undefined) {
@@ -130,9 +136,9 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
                     const newEnemy = child as Enemy;
 
                     if (enemyTypeKey === "boomerang") {
-                        (newEnemy as BoomerangEnemy).start(x, y, velocity, undefined, boomerangConfig);
+                        (newEnemy as BoomerangEnemy).start(x, y, velocity, enemyConfig, boomerangConfig);
                     } else {
-                        (newEnemy as Enemy).start(x, y, velocity);
+                        (newEnemy as Enemy).start(x, y, velocity, enemyConfig);
                     }
                     return true;
                 }
@@ -140,7 +146,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
         } else if (enemyTypeKey === "letter") {
             for (const child of this.getChildren()) {
                 if (!child.active && (child as Enemy).enemyType === enemyType && (child as LetterEnemy).text === textConfig.text) {
-                    (child as LetterEnemy).restart(x, y, velocity, textConfig.fontSize);
+                    (child as LetterEnemy).restart(x, y, velocity, textConfig.fontSize, enemyConfig);
                     return true;
                 }
             }

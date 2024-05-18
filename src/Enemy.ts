@@ -1,6 +1,6 @@
 import GameMain from "./Game";
 import Player from "./Player";
-import { EnemyType, TextConfig, BoomerangConfig } from "./EnemyGroup";
+import { EnemyType, TextConfig, BoomerangConfig, EnemyConfig } from "./EnemyGroup";
 import { CONSTANTS } from "./CONSTANTS_FILE";
 
 export interface EnemyI {
@@ -68,9 +68,9 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite impleme
         this.currentHp = this.maxHP;
     }
 
-    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, hp?: number) {
-        if (hp !== undefined) {
-            this.setHp(hp);
+    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig) {
+        if (enemyConfig !== undefined && enemyConfig.hp !== undefined) {
+            this.setHp(enemyConfig.hp);
         } else {
             this.setHp(this.enemyType.hp);
         }
@@ -208,8 +208,8 @@ export class BoomerangEnemy extends Enemy {
         this.fireEvents = [];
     }
 
-    start(x: number, y: number, velocity: Phaser.Math.Vector2, hp?: number, boomerangConfig?: BoomerangConfig) {
-        super.start(x, y, velocity, hp);
+    start(x: number, y: number, velocity: Phaser.Math.Vector2, enemyConfig?: EnemyConfig, boomerangConfig?: BoomerangConfig) {
+        super.start(x, y, velocity, enemyConfig);
 
         if (boomerangConfig === undefined) {
             // optional only for type purposes, should be mandatory
@@ -236,7 +236,7 @@ export class BoomerangEnemy extends Enemy {
                         const homingEnemyType = {width: 20, height: 20, hp: 1};
                         const homingEnemy = new HomingEnemy(this.scene, homingEnemyType, new Phaser.Math.Vector2(0, 0));
                         this.scene.enemyGroup.add(homingEnemy);
-                        homingEnemy.start(this.x, this.y, undefined, 1);
+                        homingEnemy.start(this.x, this.y, undefined);
                 })
             );
             }
@@ -264,8 +264,8 @@ export class HomingEnemy extends Enemy {
         super(scene, type, velocity);
     }
 
-    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, hp?: number) {
-        super.start(x, y, initialVelocity!, hp);
+    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig) {
+        super.start(x, y, initialVelocity!, enemyConfig);
         this.skipCollision = [false, false, false, false];
         this.scene.physics.moveToObject(this, this.scene.player, CONSTANTS.enemySpeed);
     }
@@ -287,8 +287,17 @@ export class TextEnemy extends EnemyAbstract {
         this.text = this.bitmapText.text;
     }
 
-    start(x: number, y: number, velocity: Phaser.Math.Vector2, hp?: number) {
-        super.start(x, y, velocity, hp);
+    start(x: number, y: number, velocity: Phaser.Math.Vector2, enemyConfig?: EnemyConfig) {
+        super.start(x, y, velocity, enemyConfig);
+
+        if (enemyConfig !== undefined) {
+            if (enemyConfig.width !== undefined) {
+                console.error("EnemyConfig has width for TextEnemy; value will be ignored:", enemyConfig.width);
+            }
+            if (enemyConfig.height !== undefined) {
+                console.error("EnemyConfig has height for TextEnemy; value will be ignored:", enemyConfig.height);
+            }           
+        }
 
         this.bitmapText.setActive(true);
         this.bitmapText.setVisible(true);
@@ -318,8 +327,8 @@ export class LetterEnemy extends TextEnemy {
         }
     }
 
-    restart(x: number, y: number, velocity: Phaser.Math.Vector2, fontSize: number, hp?: number) {
-        super.start(x, y, velocity, hp);
+    restart(x: number, y: number, velocity: Phaser.Math.Vector2, fontSize: number, enemyConfig?: EnemyConfig) {
+        super.start(x, y, velocity, enemyConfig);
         this.bitmapText.setFontSize(fontSize);
         this.setScale(this.bitmapText.width, this.bitmapText.height);
     }

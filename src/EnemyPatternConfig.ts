@@ -184,7 +184,7 @@ export function generateConfig(): Array<ReleaseEvent> {
         velocity: new Phaser.Math.Vector2(0, 350),
         time: START4,
         type: "boomerang",
-        hp: 1,
+        enemyConfig: {hp: 1},
         boomerangConfig: { stayTime: SPACE1, reverseTime: 7920, fireMissile: 10 },
     });
     /*
