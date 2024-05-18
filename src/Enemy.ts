@@ -41,16 +41,10 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite impleme
     skipCollision: [boolean, boolean, boolean, boolean]; // whether to skip collision: up down left right
 
     // velocity needed so we can determine which edge the enemy SHOULDN'T be destroyed on collision with.
-    constructor(scene: GameMain, type: EnemyType, initialVelocity: Phaser.Math.Vector2, hp?: number) {
+    constructor(scene: GameMain, type: EnemyType, initialVelocity: Phaser.Math.Vector2) {
         super(scene, 0, 0, "squareSmall");
         this.setOrigin(0.5);
         this.scene = scene;
-
-        if (hp !== undefined) {
-            this.setHp(hp);
-        } else {
-            this.setHp(type.hp);
-        }
 
         this.enemyType = type;
 
@@ -74,18 +68,24 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite impleme
         this.currentHp = this.maxHP;
     }
 
-    start(x: number, y: number, initialVelocity: Phaser.Math.Vector2) {
-        this.currentHp = this.maxHP;
+    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, hp?: number) {
+        if (hp !== undefined) {
+            this.setHp(hp);
+        } else {
+            this.setHp(this.enemyType.hp);
+        }
         this.hitNum = 0;
         this.clearHit();
 
         this.dynamicBody.reset(x, y);
-        this.dynamicBody.setVelocity(initialVelocity.x, initialVelocity.y);
+
+        if (initialVelocity !== undefined) {
+            this.dynamicBody.setVelocity(initialVelocity.x, initialVelocity.y);
+            this.skipCollision = [initialVelocity.y > 0, initialVelocity.y < 0, initialVelocity.x > 0, initialVelocity.x > 0];
+        }
 
         this.setActive(true);
         this.setVisible(true);
-
-        this.skipCollision = [initialVelocity.y > 0, initialVelocity.y < 0, initialVelocity.x > 0, initialVelocity.x > 0];
     }
 
     kill() {
@@ -155,8 +155,8 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite impleme
 }
 
 export class Enemy extends EnemyAbstract {
-    constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2, hp?: number) {
-        super(scene, type, velocity, hp);
+    constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
+        super(scene, type, velocity);
 
         this.scaleX = type.width;
         this.scaleY = type.height;
@@ -193,8 +193,9 @@ export class CircleEnemy extends EnemyAbstract {
 }
 
 export class BoomerangEnemy extends Enemy {
-    stayEvent: Phaser.Time.TimerEvent | null;
-    reverseEvent: Phaser.Time.TimerEvent | null;
+    stayEvent: Phaser.Time.TimerEvent | undefined;
+    fireEvents: Array<Phaser.Time.TimerEvent>;
+    reverseEvent: Phaser.Time.TimerEvent | undefined;
 
     constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
         super(scene, type, velocity);
@@ -204,12 +205,14 @@ export class BoomerangEnemy extends Enemy {
         this.stayEvent = null;
         this.reverseEvent = null;
         */
+        this.fireEvents = [];
     }
 
-    start(x: number, y: number, velocity: Phaser.Math.Vector2, boomerangConfig?: BoomerangConfig) {
-        super.start(x, y, velocity);
+    start(x: number, y: number, velocity: Phaser.Math.Vector2, hp?: number, boomerangConfig?: BoomerangConfig) {
+        super.start(x, y, velocity, hp);
 
-        if (boomerangConfig === undefined) { // optional only for type purposes, should be mandatory
+        if (boomerangConfig === undefined) {
+            // optional only for type purposes, should be mandatory
             console.error("boomerangConfig is undefined on start call");
             return;
         }
@@ -217,14 +220,27 @@ export class BoomerangEnemy extends Enemy {
         let newVelocity: Phaser.Math.Vector2;
         if (boomerangConfig.newVelocity === undefined) {
             newVelocity = velocity.negate();
-        }
-        else {
+        } else {
             newVelocity = boomerangConfig.newVelocity;
         }
 
         this.stayEvent = this.scene.time.delayedCall(boomerangConfig.stayTime, () => {
             this.dynamicBody.velocity.set(0);
         });
+        if (boomerangConfig.fireMissile !== undefined) {
+            const timeBetweenFire = boomerangConfig.reverseTime / boomerangConfig.fireMissile;
+
+            for (let i = 0; i < boomerangConfig.fireMissile; i++) {
+                this.fireEvents.push(
+                    this.scene.time.delayedCall(boomerangConfig.stayTime + timeBetweenFire * i, () => {
+                        const homingEnemyType = {width: 20, height: 20, hp: 1};
+                        const homingEnemy = new HomingEnemy(this.scene, homingEnemyType, new Phaser.Math.Vector2(0, 0));
+                        this.scene.enemyGroup.add(homingEnemy);
+                        homingEnemy.start(this.x, this.y, undefined, 1);
+                })
+            );
+            }
+        }
         this.reverseEvent = this.scene.time.delayedCall(boomerangConfig.stayTime + boomerangConfig.reverseTime, () => {
             this.skipCollision = [false, false, false, false];
             this.dynamicBody.velocity = newVelocity;
@@ -236,20 +252,31 @@ export class BoomerangEnemy extends Enemy {
 
         this.stayEvent?.destroy();
         this.reverseEvent?.destroy();
-
-        console.log("boomerang dead");
+        for (const fireEvent of this.fireEvents) {
+            fireEvent.destroy();
+        }
     }
 }
 
 export class HomingEnemy extends Enemy {
+
+    constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
+        super(scene, type, velocity);
+    }
+
+    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, hp?: number) {
+        super.start(x, y, initialVelocity!, hp);
+        this.skipCollision = [false, false, false, false];
+        this.scene.physics.moveToObject(this, this.scene.player, CONSTANTS.enemySpeed);
+    }
 }
 
 export class TextEnemy extends EnemyAbstract {
     bitmapText: Phaser.GameObjects.BitmapText;
     text: string;
 
-    constructor(scene: GameMain, type: EnemyType, textConfig: TextConfig, initialVelocity: Phaser.Math.Vector2, hp?: number) {
-        super(scene, type, initialVelocity, hp);
+    constructor(scene: GameMain, type: EnemyType, textConfig: TextConfig, initialVelocity: Phaser.Math.Vector2) {
+        super(scene, type, initialVelocity);
 
         this.bitmapText = new Phaser.GameObjects.BitmapText(scene, 0, 0, "DisplayFont", textConfig.text, textConfig.fontSize);
         this.bitmapText.setOrigin(0.5);
@@ -260,8 +287,8 @@ export class TextEnemy extends EnemyAbstract {
         this.text = this.bitmapText.text;
     }
 
-    start(x: number, y: number, velocity: Phaser.Math.Vector2) {
-        super.start(x, y, velocity);
+    start(x: number, y: number, velocity: Phaser.Math.Vector2, hp?: number) {
+        super.start(x, y, velocity, hp);
 
         this.bitmapText.setActive(true);
         this.bitmapText.setVisible(true);
@@ -282,8 +309,8 @@ export class TextEnemy extends EnemyAbstract {
 }
 
 export class LetterEnemy extends TextEnemy {
-    constructor(scene: GameMain, type: EnemyType, textConfig: TextConfig, initialVelocity: Phaser.Math.Vector2, hp?: number) {
-        super(scene, type, textConfig, initialVelocity, hp);
+    constructor(scene: GameMain, type: EnemyType, textConfig: TextConfig, initialVelocity: Phaser.Math.Vector2) {
+        super(scene, type, textConfig, initialVelocity);
 
         if (textConfig.text.length !== 1) {
             console.error("Character length of LetterEnemy is not 1!");
@@ -291,8 +318,8 @@ export class LetterEnemy extends TextEnemy {
         }
     }
 
-    restart(x: number, y: number, velocity: Phaser.Math.Vector2, fontSize: number) {
-        super.start(x, y, velocity);
+    restart(x: number, y: number, velocity: Phaser.Math.Vector2, fontSize: number, hp?: number) {
+        super.start(x, y, velocity, hp);
         this.bitmapText.setFontSize(fontSize);
         this.setScale(this.bitmapText.width, this.bitmapText.height);
     }

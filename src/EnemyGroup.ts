@@ -1,5 +1,5 @@
 import { CONSTANTS } from "./CONSTANTS_FILE";
-import { EnemyI, Enemy, WavyEnemy, LetterEnemy, TextEnemy, EnemyAbstract, BoomerangEnemy, CircleEnemy } from "./Enemy";
+import { EnemyI, Enemy, WavyEnemy, LetterEnemy, TextEnemy, BoomerangEnemy, CircleEnemy } from "./Enemy";
 import { generateConfig } from "./EnemyConfig";
 import GameMain from "./Game";
 
@@ -49,7 +49,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             word: { width: -1, height: -1, hp: 4, text: true },
             letter: { width: -1, height: -1, hp: 1, text: true },
             boomerang: { width: 75, height: 75, hp: 999 },
-            circle: { width: 10, height: -1, hp: -1 }, // height doesn't matter
+            circle: { width: 10, height: -1, hp: -1 }, // height doesn't matter,
         };
 
         this.config = generateConfig();
@@ -103,7 +103,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
 
             this.add(newEnemy as unknown as Phaser.GameObjects.GameObject);
             if (enemyTypeKey === "boomerang") {
-                (newEnemy as BoomerangEnemy).start(x, y, velocity, boomerangConfig);
+                (newEnemy as BoomerangEnemy).start(x, y, velocity, undefined, boomerangConfig);
             }
             else {
                 newEnemy.start(x, y, velocity);
@@ -130,7 +130,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
                     const newEnemy = child as Enemy;
 
                     if (enemyTypeKey === "boomerang") {
-                        (newEnemy as BoomerangEnemy).start(x, y, velocity, boomerangConfig);
+                        (newEnemy as BoomerangEnemy).start(x, y, velocity, undefined, boomerangConfig);
                     } else {
                         (newEnemy as Enemy).start(x, y, velocity);
                     }

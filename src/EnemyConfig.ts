@@ -27,7 +27,7 @@ function generateLetterText(releaseEvents: Array<ReleaseEvent>): undefined | Arr
 
         // 29 is for a 72 height font; must adjust width for variable fontsizes
         const sizeAdjustedWidth = FONTWIDTH * (releaseEvent.textConfig.fontSize / 72);
-        const real_starting_x = releaseEvent.x - (sizeAdjustedWidth * releaseEvent.textConfig.text.length / 2) + (sizeAdjustedWidth/2); // add sizeAdjustedWidth/2 because the x is relative to origin
+        const real_starting_x = releaseEvent.x - (sizeAdjustedWidth * releaseEvent.textConfig.text.length) / 2 + sizeAdjustedWidth / 2; // add sizeAdjustedWidth/2 because the x is relative to origin
 
         for (let i = 0; i < releaseEvent.textConfig.text.length; i++) {
             let newRelease: ReleaseEvent = {
@@ -44,7 +44,6 @@ function generateLetterText(releaseEvents: Array<ReleaseEvent>): undefined | Arr
 
     return results;
 }
-
 
 export function generateConfig(): Array<ReleaseEvent> {
     let config: Array<ReleaseEvent> = [];
@@ -70,24 +69,26 @@ export function generateConfig(): Array<ReleaseEvent> {
     // diagonal ups
     const diag1 = ["✦", "✧"];
     const diag2 = ["$", "€"];
+    const START_DIAG = 5040;
     for (let i = 0; i < 13; i++) {
         for (let j = 0; j < 20; j++) {
             if (i % 2 === 0) {
-                config.push({ x: 0 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 36 * j, type: "letter", textConfig: { text: diag1[j % 2], fontSize: 40 } });
+                config.push({ x: 0 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: START_DIAG + 1440 * i + 36 * j, type: "letter", textConfig: { text: diag1[j % 2], fontSize: 40 } });
             } else {
-                config.push({ x: CONSTANTS.width - j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 5000 + 1440 * i + 36 * j, type: "letter", textConfig: { text: diag2[j % 2], fontSize: 70 } });
+                config.push({ x: CONSTANTS.width - j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: START_DIAG + 1440 * i + 36 * j, type: "letter", textConfig: { text: diag2[j % 2], fontSize: 70 } });
             }
         }
     }
 
     // coming from left
     const diag3 = ["Y", "U", "B"];
+    const START_HOR1 = 7920;
     for (let i = 0; i < 11; i++) {
         for (let j = 0; j < 3; j++) {
             if (i % 2 === 0) {
-                config.push({ x: -50, y: 475, velocity: new Phaser.Math.Vector2(200, 0), time: 7880 + 1440 * i + HOR_SPACING * j, type: "letter", textConfig: { text: diag2[j % 2], fontSize: HOR_FONTSIZE } });
+                config.push({ x: -50, y: 475, velocity: new Phaser.Math.Vector2(200, 0), time: START_HOR1 + 1440 * i + HOR_SPACING * j, type: "letter", textConfig: { text: diag2[j % 2], fontSize: HOR_FONTSIZE } });
             } else {
-                config.push({ x: -50, y: 525, velocity: new Phaser.Math.Vector2(200, 0), time: 7880 + 1440 * i + HOR_SPACING * j, type: "letter", textConfig: { text: diag3[j % 3], fontSize: HOR_FONTSIZE } });
+                config.push({ x: -50, y: 525, velocity: new Phaser.Math.Vector2(200, 0), time: START_HOR1 + 1440 * i + HOR_SPACING * j, type: "letter", textConfig: { text: diag3[j % 3], fontSize: HOR_FONTSIZE } });
             }
         }
     }
@@ -175,6 +176,32 @@ export function generateConfig(): Array<ReleaseEvent> {
     for (let i = 0; i < 10; i++) {
         config.push({ x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: START3 + 90 * i, type: "wavy" });
     }
+
+    const START4 = 64170;
+    config.push({
+        x: CONSTANTS.originX,
+        y: -50,
+        velocity: new Phaser.Math.Vector2(0, 350),
+        time: START4,
+        type: "boomerang",
+        hp: 1,
+        boomerangConfig: { stayTime: SPACE1, reverseTime: 7920, fireMissile: 10 },
+    });
+    /*
+    for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 4; j++) {
+            config.push({
+                x: CONSTANTS.originX,
+                y: -50,
+                velocity: new Phaser.Math.Vector2(0, 350),
+                time: START4 + 720 * i + 720 * j,
+                type: "boomerang",
+                hp: 1,
+                boomerangConfig: { stayTime: SPACE1, reverseTime: 7920, fireMissile: 5 },
+            });
+        }
+    }
+    */
 
     return config;
 }
