@@ -1,5 +1,5 @@
 import { CONSTANTS } from "./CONSTANTS_FILE";
-import { EnemyAbstract, Enemy, WavyEnemy, LetterEnemy, TextEnemy, BoomerangEnemy, CircleEnemy } from "./Enemy";
+import { EnemyAbstract, Enemy, WavyEnemy, LetterEnemy, TextEnemy, BoomerangEnemy, CircleEnemy, BlockyEnemy } from "./Enemy";
 import { generateConfig } from "./EnemyPatternConfig";
 import GameMain from "./Game";
 
@@ -26,6 +26,7 @@ export type EnemyConfig = {
     width?: number;
     height?: number;
     hp?: number;
+    counterClockwise?: number; // number of 90 degree counterclockwise rotations. 0 to 3; number > 3 will be % 4
 }
 
 export type ReleaseEvent = {
@@ -52,6 +53,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             "2": { width: 18, height: 18, hp: 1 },
             "3": { width: CONSTANTS.width, height: 2, hp: 1 },
             wavy: { width: CONSTANTS.width, height: 9, hp: -1 },
+            blocky: { width: CONSTANTS.width, height: 9, hp: -1 },
             word: { width: -1, height: -1, hp: 4, text: true },
             letter: { width: -1, height: -1, hp: 1, text: true },
             boomerang: { width: 75, height: 75, hp: 999 },
@@ -99,6 +101,8 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
         if (enemyType.text === undefined) {
             if (enemyTypeKey === "wavy") {
                 newEnemy = new WavyEnemy(this.scene as GameMain, enemyType, velocity);
+            } else if (enemyTypeKey === "blocky") {
+                newEnemy = new BlockyEnemy(this.scene as GameMain, enemyType, velocity);
             } else if (enemyTypeKey === "boomerang") {
                 newEnemy = new BoomerangEnemy(this.scene as GameMain, enemyType, velocity);
             } else if (enemyTypeKey === "circle") {

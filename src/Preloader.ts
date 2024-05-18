@@ -30,6 +30,7 @@ export default class Preloader extends Phaser.Scene
         this.load.image("squareSmall", "assets/squareSmall.png");
 
         this.load.spritesheet('sheetWavy', 'assets/sheetWavy.png', { frameWidth: 900, frameHeight: 9 });
+        this.load.spritesheet('sheetBlocky', 'assets/sheetBlocky.png', { frameWidth: 900, frameHeight: 9 });
 
         /*
         this.load.setPath('assets/games/snowmen-attack/');
@@ -53,6 +54,12 @@ export default class Preloader extends Phaser.Scene
         this.anims.create({
             key: 'wavy',
             frames: this.anims.generateFrameNumbers('sheetWavy', { frames: [ 0, 1, 2 ] }),
+            frameRate: 8,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'blocky',
+            frames: this.anims.generateFrameNumbers('sheetBlocky', { frames: [ 0, 1, 2 ] }),
             frameRate: 8,
             repeat: -1
         });

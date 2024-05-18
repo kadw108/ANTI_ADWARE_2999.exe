@@ -52,6 +52,23 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
         } else {
             this.setHp(this.enemyType.hp);
         }
+
+        if (enemyConfig !== undefined && enemyConfig.counterClockwise !== undefined) {
+            switch (enemyConfig.counterClockwise % 4) {
+                case 0:
+                    break;
+                case 1:
+                    this.angle = -90;
+                    break;
+                case 2:
+                    this.angle = -180;
+                    break;
+                case 3:
+                    this.angle = -270;
+                    break;
+            }
+        }
+
         this.hitNum = 0;
         this.clearHit();
 
@@ -154,15 +171,42 @@ export class Enemy extends EnemyAbstract {
     }
 }
 
-export class WavyEnemy extends EnemyAbstract {
+export class LineEnemy extends EnemyAbstract {
     constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
         super(scene, type, velocity);
-
-        this.play("wavy");
 
         // don't want to set scale because that affects image/anim size, so just
         // set size of body
         this.dynamicBody.setSize(type.width, type.height);
+    }
+
+    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig) {
+        super.start(x, y, initialVelocity, enemyConfig);
+
+        if (enemyConfig !== undefined) {
+            if (enemyConfig.width !== undefined && enemyConfig.height !== undefined) {
+                this.dynamicBody.setSize(enemyConfig.width, enemyConfig.height);
+            }
+
+            if (enemyConfig.counterClockwise !== undefined) {
+                switch (enemyConfig.counterClockwise % 4) {
+                    case 0:
+                    case 2:
+                        break;
+                    case 1:
+                    case 3:
+                        this.dynamicBody.setSize(this.dynamicBody.height, this.dynamicBody.width);
+                        break;
+                }
+            }
+        }
+    }
+}
+
+export class WavyEnemy extends LineEnemy {
+    constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
+        super(scene, type, velocity);
+        this.play("wavy");
     }
 
     onHitPlayer(player: Player): void {
@@ -170,12 +214,17 @@ export class WavyEnemy extends EnemyAbstract {
             player.hit();
         }
     }
+}
 
-    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig) {
-        super.start(x, y, initialVelocity, enemyConfig);
+export class BlockyEnemy extends LineEnemy {
+    constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
+        super(scene, type, velocity);
+        this.play("blocky");
+    }
 
-        if (enemyConfig !== undefined && enemyConfig.width !== undefined && enemyConfig.height !== undefined) {
-            this.dynamicBody.setSize(enemyConfig.width, enemyConfig.height);
+    onHitPlayer(player: Player): void {
+        if (player.dynamicBody.speed !== 0) {
+            player.hit();
         }
     }
 }
@@ -303,6 +352,9 @@ export class TextEnemy extends EnemyAbstract {
             }
             if (enemyConfig.height !== undefined) {
                 console.error("EnemyConfig has height for TextEnemy; value will be ignored:", enemyConfig.height);
+            }
+            if (enemyConfig.counterClockwise !== undefined) {
+                console.error("EnemyConfig has counterClockwise for TextEnemy; value will be ignored:", enemyConfig.counterClockwise);
             }
         }
 

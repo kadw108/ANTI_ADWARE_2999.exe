@@ -97,6 +97,10 @@ export function generateConfig(): Array<ReleaseEvent> {
         config.push({ x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 23720 + 720 * i, type: "wavy" });
     }
 
+    for (let i = 0; i < 28; i++) {
+        config.push({ x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: 0 + 720 * i, type: "wavy" });
+    }
+
     // coming from right
     const diag4 = ["B", "U", "Y"];
     for (let i = 0; i < 5; i++) {
