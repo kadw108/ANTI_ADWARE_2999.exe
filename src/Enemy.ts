@@ -3,29 +3,7 @@ import Player from "./Player";
 import { EnemyType, TextConfig, BoomerangConfig, EnemyConfig } from "./EnemyGroup";
 import { CONSTANTS } from "./CONSTANTS_FILE";
 
-export interface EnemyI {
-    scene: GameMain;
-
-    dynamicBody: Phaser.Physics.Arcade.Body;
-    onWorldBounds: Function;
-
-    currentHp: number;
-    canHit: boolean;
-    enemyType: EnemyType;
-
-    hitNum: number;
-
-    start(x: number, y: number, velocity: Phaser.Math.Vector2): void;
-    hit(): void;
-    onHitPlayer(player: Player): void;
-    kill(): void;
-
-    /* stuff most gameobjects and sprites have */
-
-    active: boolean;
-}
-
-export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite implements EnemyI {
+export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
     scene: GameMain;
 
     dynamicBody: Phaser.Physics.Arcade.Body;
@@ -161,6 +139,19 @@ export class Enemy extends EnemyAbstract {
         this.scaleX = type.width;
         this.scaleY = type.height;
     }
+
+    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig) {
+        super.start(x, y, initialVelocity, enemyConfig);
+
+        if (enemyConfig !== undefined) {
+            if (enemyConfig.width !== undefined) {
+                this.scaleX = enemyConfig.width;
+            }
+            if (enemyConfig.height !== undefined) {
+                this.scaleY = enemyConfig.height;
+            }
+        }
+    }
 }
 
 export class WavyEnemy extends EnemyAbstract {
@@ -179,6 +170,14 @@ export class WavyEnemy extends EnemyAbstract {
             player.hit();
         }
     }
+
+    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig) {
+        super.start(x, y, initialVelocity, enemyConfig);
+
+        if (enemyConfig !== undefined && enemyConfig.width !== undefined && enemyConfig.height !== undefined) {
+            this.dynamicBody.setSize(enemyConfig.width, enemyConfig.height);
+        }
+    }
 }
 
 export class CircleEnemy extends EnemyAbstract {
@@ -189,6 +188,15 @@ export class CircleEnemy extends EnemyAbstract {
 
         this.scale = type.width / 50;
         this.setCircle(type.width);
+    }
+
+    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig) {
+        super.start(x, y, initialVelocity, enemyConfig);
+
+        if (enemyConfig !== undefined && enemyConfig.width !== undefined) {
+            this.scale = enemyConfig.width / 50;
+            this.setCircle(enemyConfig.width);
+        }
     }
 }
 
@@ -233,12 +241,12 @@ export class BoomerangEnemy extends Enemy {
             for (let i = 0; i < boomerangConfig.fireMissile; i++) {
                 this.fireEvents.push(
                     this.scene.time.delayedCall(boomerangConfig.stayTime + timeBetweenFire * i, () => {
-                        const homingEnemyType = {width: 20, height: 20, hp: 1};
+                        const homingEnemyType = { width: 20, height: 20, hp: 1 };
                         const homingEnemy = new HomingEnemy(this.scene, homingEnemyType, new Phaser.Math.Vector2(0, 0));
                         this.scene.enemyGroup.add(homingEnemy);
                         homingEnemy.start(this.x, this.y, undefined);
-                })
-            );
+                    })
+                );
             }
         }
         this.reverseEvent = this.scene.time.delayedCall(boomerangConfig.stayTime + boomerangConfig.reverseTime, () => {
@@ -259,7 +267,6 @@ export class BoomerangEnemy extends Enemy {
 }
 
 export class HomingEnemy extends Enemy {
-
     constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
         super(scene, type, velocity);
     }
@@ -296,7 +303,7 @@ export class TextEnemy extends EnemyAbstract {
             }
             if (enemyConfig.height !== undefined) {
                 console.error("EnemyConfig has height for TextEnemy; value will be ignored:", enemyConfig.height);
-            }           
+            }
         }
 
         this.bitmapText.setActive(true);

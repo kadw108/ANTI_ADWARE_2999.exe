@@ -1,5 +1,5 @@
 import Player from "./Player";
-import { EnemyI } from "./Enemy";
+import { EnemyAbstract } from "./Enemy";
 import { EnemyGroup } from "./EnemyGroup";
 import { PlayerBullet, PlayerBulletGroup } from "./PlayerBullet";
 
@@ -56,10 +56,10 @@ export default class GameMain extends Phaser.Scene {
         });
 
         // @ts-ignore
-        this.physics.add.overlap(this.player, this.enemyGroup, (player, enemy) => this.playerHitEnemy(player as Player, enemy as EnemyI));
+        this.physics.add.overlap(this.player, this.enemyGroup, (player, enemy) => this.playerHitEnemy(player as Player, enemy as EnemyAbstract));
         this.physics.add.overlap(this.playerBulletGroup, this.enemyGroup, (bullet, enemy) => {
             // @ts-ignore
-            this.playerBulletHitEnemy(bullet as PlayerBullet, enemy as EnemyI);
+            this.playerBulletHitEnemy(bullet as PlayerBullet, enemy as EnemyAbstract);
         });
 
         this.hpText = this.add.text(10, 20, "", { fontFamily: "DisplayFont", fontSize: 40, color: "#ffffff" });
@@ -100,12 +100,12 @@ export default class GameMain extends Phaser.Scene {
         this.start();
     }
 
-    playerHitEnemy(player: Player, enemy: EnemyI) {
+    playerHitEnemy(player: Player, enemy: EnemyAbstract) {
         if (enemy.active) {
             enemy.onHitPlayer(player);
         }
     }
-    playerBulletHitEnemy(bullet: PlayerBullet, enemy: EnemyI) {
+    playerBulletHitEnemy(bullet: PlayerBullet, enemy: EnemyAbstract) {
         if (bullet.active && enemy.active && enemy.canHit) {
             bullet.kill();
             enemy.hit();

@@ -1,3 +1,5 @@
+import { CONSTANTS } from "./CONSTANTS_FILE";
+
 export class PlayerBulletGroup extends Phaser.Physics.Arcade.Group
 {
     constructor (scene: Phaser.Scene)
@@ -54,7 +56,7 @@ export class PlayerBullet extends Phaser.Physics.Arcade.Sprite
         this.setActive(true);
         this.setVisible(true);
 
-        this.setVelocityY(-200);
+        this.setVelocityY(-CONSTANTS.bulletSpeed);
     }
 
     kill ()

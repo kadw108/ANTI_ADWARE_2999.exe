@@ -8,4 +8,5 @@ export const CONSTANTS = {
     originY: HEIGHT/2,
 
     enemySpeed: 200,
+    bulletSpeed: 250,
 };

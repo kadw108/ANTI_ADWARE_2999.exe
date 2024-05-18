@@ -1,5 +1,5 @@
 import { CONSTANTS } from "./CONSTANTS_FILE";
-import { EnemyI, Enemy, WavyEnemy, LetterEnemy, TextEnemy, BoomerangEnemy, CircleEnemy } from "./Enemy";
+import { EnemyAbstract, Enemy, WavyEnemy, LetterEnemy, TextEnemy, BoomerangEnemy, CircleEnemy } from "./Enemy";
 import { generateConfig } from "./EnemyPatternConfig";
 import GameMain from "./Game";
 
@@ -95,7 +95,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             return;
         }
 
-        let newEnemy: EnemyI;
+        let newEnemy: EnemyAbstract;
         if (enemyType.text === undefined) {
             if (enemyTypeKey === "wavy") {
                 newEnemy = new WavyEnemy(this.scene as GameMain, enemyType, velocity);
@@ -109,10 +109,10 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
 
             this.add(newEnemy as unknown as Phaser.GameObjects.GameObject);
             if (enemyTypeKey === "boomerang") {
-                (newEnemy as BoomerangEnemy).start(x, y, velocity, undefined, boomerangConfig);
+                (newEnemy as BoomerangEnemy).start(x, y, velocity, enemyConfig, boomerangConfig);
             }
             else {
-                newEnemy.start(x, y, velocity);
+                newEnemy.start(x, y, velocity, enemyConfig);
             }
         } else {
             if (enemyTypeKey === "letter") {
@@ -123,7 +123,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             // the checks at the start catch the 'else' category
 
             this.add(newEnemy! as unknown as Phaser.GameObjects.GameObject);
-            newEnemy!.start(x, y, velocity);
+            newEnemy!.start(x, y, velocity, enemyConfig);
         }
     }
 
@@ -157,7 +157,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
 
     stop() {
         this.getChildren().forEach((child) => {
-            (child as unknown as EnemyI).kill();
+            (child as unknown as EnemyAbstract).kill();
         });
     }
 

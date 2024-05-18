@@ -178,30 +178,41 @@ export function generateConfig(): Array<ReleaseEvent> {
     }
 
     const START4 = 64170;
+    const SPACE2 = 2500;
     config.push({
-        x: CONSTANTS.originX,
+        x: CONSTANTS.originX + 60,
         y: -50,
-        velocity: new Phaser.Math.Vector2(0, 350),
+        velocity: new Phaser.Math.Vector2(0, 200),
         time: START4,
         type: "boomerang",
-        enemyConfig: {hp: 1},
-        boomerangConfig: { stayTime: SPACE1, reverseTime: 7920, fireMissile: 10 },
+        enemyConfig: {height: 35, width: 35, hp: 1},
+        boomerangConfig: { stayTime: SPACE2, reverseTime: 720, fireMissile: 5 },
     });
-    /*
+    config.push({
+        x: CONSTANTS.originX - 60,
+        y: -50,
+        velocity: new Phaser.Math.Vector2(0, 200),
+        time: START4,
+        type: "boomerang",
+        enemyConfig: {height: 35, width: 35, hp: 1},
+        boomerangConfig: { stayTime: SPACE2, reverseTime: 720, fireMissile: 5 },
+    });
+
+
+    const START5 = 66240;
     for (let i = 0; i < 3; i++) {
         for (let j = 0; j < 4; j++) {
             config.push({
-                x: CONSTANTS.originX,
+                x: CONSTANTS.originX - 100 + j * 50,
                 y: -50,
-                velocity: new Phaser.Math.Vector2(0, 350),
-                time: START4 + 720 * i + 720 * j,
+                velocity: new Phaser.Math.Vector2(0, 200),
+                time: START5 + i * 2880,
                 type: "boomerang",
-                hp: 1,
-                boomerangConfig: { stayTime: SPACE1, reverseTime: 7920, fireMissile: 5 },
+                enemyConfig: {height: 35, width: 35, hp: 1},
+                boomerangConfig: { stayTime: SPACE2, reverseTime: 720, fireMissile: 5 },
             });
         }
     }
-    */
 
     return config;
 }
