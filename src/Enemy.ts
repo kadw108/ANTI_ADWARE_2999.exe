@@ -101,7 +101,7 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
             this.scene.sound.play("sfxDestroy2");
             this.kill();
         } else {
-            this.setTintFill(0xff0000);
+            this.setTint(0xff0000);
             this.hitNum++;
             this.scene.time.delayedCall(300, () => {
                 this.hitNum--;
@@ -241,22 +241,21 @@ export class CircleEnemy extends EnemyAbstract {
     constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
         super(scene, type, velocity);
 
-        this.setTexture("circle");
+        this.setTexture("atlas1", "circle.png");
     }
 
     start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig) {
         super.start(x, y, initialVelocity, enemyConfig);
 
-        this.scale = this.enemyType.width / 50;
-        this.setCircle(this.enemyType.width);
+        let newWidth = this.enemyType.width;
         if (enemyConfig !== undefined && enemyConfig.width !== undefined) {
-            this.scale = enemyConfig.width / 50;
-            this.setCircle(enemyConfig.width);
+            newWidth = enemyConfig.width;
         }
+        this.setCircle(newWidth);
     }
 }
 
-export class BoomerangEnemy extends Enemy {
+export class BoomerangEnemy extends EnemyAbstract {
     stayEvent: Phaser.Time.TimerEvent | undefined;
     fireEvents: Array<Phaser.Time.TimerEvent>;
     reverseEvent: Phaser.Time.TimerEvent | undefined;
@@ -270,6 +269,8 @@ export class BoomerangEnemy extends Enemy {
         this.reverseEvent = null;
         */
         this.fireEvents = [];
+
+        this.setTexture("atlas1", "boomerangSmall.png");
     }
 
     start(x: number, y: number, velocity: Phaser.Math.Vector2, enemyConfig?: EnemyConfig, boomerangConfig?: BoomerangConfig) {
@@ -280,6 +281,19 @@ export class BoomerangEnemy extends Enemy {
             console.error("boomerangConfig is undefined on start call");
             return;
         }
+
+        let newWidth = this.enemyType.width;
+        if (enemyConfig !== undefined && enemyConfig.width !== undefined) {
+            newWidth = enemyConfig.width;
+        }
+        if (newWidth > 60) { // hardcoded; possible TODO - improve?
+            this.play("boomerangBig");
+        }
+        else {
+            this.stop();
+            this.setTexture("atlas1", "boomerangSmall.png");
+        }
+        this.setCircle(newWidth);
 
         let newVelocity: Phaser.Math.Vector2;
         if (boomerangConfig.newVelocity === undefined) {
@@ -326,13 +340,28 @@ export class BoomerangEnemy extends Enemy {
     }
 }
 
-export class HomingEnemy extends Enemy {
+export class HomingEnemy extends EnemyAbstract {
     constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
         super(scene, type, velocity);
+
+        this.setTexture("atlas1", "homing.png");
     }
 
     start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig) {
         super.start(x, y, initialVelocity!, enemyConfig);
+
+        let collisionWidth = this.enemyType.width;
+        let collisionHeight = this.enemyType.height;
+        if (enemyConfig !== undefined) {
+            if (enemyConfig.width !== undefined) {
+                collisionWidth = enemyConfig.width;
+            }
+            if (enemyConfig.height !== undefined) {
+                collisionHeight = enemyConfig.height;
+            }
+        }
+        this.dynamicBody.setSize(collisionWidth, collisionHeight, true);
+
         this.skipCollision = [false, false, false, false];
         this.scene.physics.moveToObject(this, this.scene.player, CONSTANTS.enemySpeed);
     }

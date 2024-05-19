@@ -41,12 +41,16 @@ export class PlayerBullet extends Phaser.Physics.Arcade.Sprite
 
     constructor (scene: Phaser.Scene, x: number, y: number)
     {
-        super(scene, x, y, 'circle');
-        this.scale = 0.2;
+        super(scene, x, y, "atlas1", "bullet.png");
 
         scene.physics.add.existing(this);
         // @ts-ignore
         this.dynamicBody = this.body as Phaser.Physics.Arcade.Body;
+
+        // Think if center is false,
+        // then the physics body is always positioned from the top-left
+        // so it's ok that bullet.png has height greater than 9px
+        this.dynamicBody.setSize(9, 9, false);
     }
 
     fire (x: number, y: number)

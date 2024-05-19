@@ -21,15 +21,22 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     isAlive: boolean;
 
     constructor(scene: GameMain) {
-        super(scene, 450, 550, "circle");
-        this.scale = 0.24; // sprite = circle w radius 13
+        super(scene, 450, 550, "atlas1", "player.png");
+        // super(scene, 450, 550, "circle");
+        /* this.scale = 0.24; // sprite = circle w radius 13 */
 
         this.scene = scene;
 
         scene.add.existing(this);
         scene.physics.add.existing(this);
         // @ts-ignore
+
         this.dynamicBody = this.body as Phaser.Physics.Arcade.Body;
+
+        // physics body is always positioned from the top-left of the game object
+        // hardcoded value from looking at image
+        this.dynamicBody.setCircle(7.5, 4, 4);
+
         this.dynamicBody.setCollideWorldBounds(true, 0, 0);
         this.dynamicBody.setImmovable(true);
 
@@ -43,6 +50,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.currentHP = this.maxHP;
 
         this.isAlive = false;
+
+        this.depth = 3;
     }
 
     start() {
@@ -74,7 +83,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (this.cursors.space.isDown && this.canShoot) {
             this.canShoot = false;
 
-            this.scene.playerBulletGroup.fireBullet(this.x, this.y);
+            this.scene.playerBulletGroup.fireBullet(this.x, this.y - 5);
 
             this.scene.time.delayedCall(SHOOT_COOLDOWN, () => {
                 this.canShoot = true;

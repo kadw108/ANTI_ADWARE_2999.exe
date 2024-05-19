@@ -348,7 +348,7 @@ export function generateConfig(): Array<ReleaseEvent> {
                     x: CONSTANTS.originX - 95 + (j % 4) * 30,
                     y: -50,
                     velocity: new Phaser.Math.Vector2(0, 200),
-                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 260, // >> 0 for integer division
+                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 190, // >> 0 for integer division
                     type: "letter",
                     textConfig: { text: diag5[j % 2], fontSize: 58 },
                 });
@@ -357,7 +357,7 @@ export function generateConfig(): Array<ReleaseEvent> {
                     x: CONSTANTS.originX + 30 + (j % 4) * 30,
                     y: -50,
                     velocity: new Phaser.Math.Vector2(0, 200),
-                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 260,
+                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 190,
                     type: "letter",
                     textConfig: { text: diag5[j % 2], fontSize: 58 },
                 });
@@ -392,7 +392,7 @@ export function generateConfig(): Array<ReleaseEvent> {
                 config.push({
                     x: CONSTANTS.originX - X_RANGE3 / 2 + j * (X_RANGE3 / NUM_PER_WAVE3) + X_RANGE3 / NUM_PER_WAVE3 / 2,
                     y: -50,
-                    velocity: new Phaser.Math.Vector2(0, 225),
+                    velocity: new Phaser.Math.Vector2(0, 235),
                     time: START15 + i * (HALF_MEASURE * 3),
                     type: "boomerang",
                     enemyConfig: { height: 35, width: 35, hp: 1 },

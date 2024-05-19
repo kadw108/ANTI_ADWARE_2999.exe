@@ -50,5 +50,5 @@
 }
 
 body {
-    animation: rotatehuelight 1s infinite alternate;
+    animation: rotatehueverylight 1s infinite alternate;
 }
