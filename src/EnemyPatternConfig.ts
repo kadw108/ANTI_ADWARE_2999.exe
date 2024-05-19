@@ -83,8 +83,7 @@ function generateDisco(startTime: number, stayTime: number): Array<ReleaseEvent>
     return config;
 }
 
-function generateLines(startTime: number, timeBetween: number, numLines: number, lineType: string, fromDirection: "up" | "left" | "right"): Array<ReleaseEvent>
-{
+function generateLines(startTime: number, timeBetween: number, numLines: number, lineType: string, fromDirection: "up" | "left" | "right"): Array<ReleaseEvent> {
     const config = [];
 
     for (let i = 0; i < numLines; i++) {
@@ -93,10 +92,10 @@ function generateLines(startTime: number, timeBetween: number, numLines: number,
                 config.push({ x: CONSTANTS.originX, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: startTime + timeBetween * i, type: lineType });
                 break;
             case "left":
-                config.push({ x: -50, y: CONSTANTS.originY, velocity: new Phaser.Math.Vector2(200, 0), time: startTime + timeBetween * i, type: lineType, enemyConfig: {counterClockwise: 1} });
+                config.push({ x: -50, y: CONSTANTS.originY, velocity: new Phaser.Math.Vector2(200, 0), time: startTime + timeBetween * i, type: lineType, enemyConfig: { counterClockwise: 1 } });
                 break;
             case "right":
-                config.push({ x: CONSTANTS.width + 50, y: CONSTANTS.originY, velocity: new Phaser.Math.Vector2(-200, 0), time: startTime + timeBetween * i, type: lineType, enemyConfig: {counterClockwise: 1} });
+                config.push({ x: CONSTANTS.width + 50, y: CONSTANTS.originY, velocity: new Phaser.Math.Vector2(-200, 0), time: startTime + timeBetween * i, type: lineType, enemyConfig: { counterClockwise: 1 } });
                 break;
             default:
                 console.error("generateLines has invalid fromDirection value", fromDirection);
@@ -331,7 +330,7 @@ export function generateConfig(): Array<ReleaseEvent> {
     }
 
     const START12 = START11 + MEASURE * 2;
-    for (const event of generateLines(START12, MEASURE, 12, "blocky", "left")) {
+    for (const event of generateLines(START12, MEASURE * 2, 6, "blocky", "left")) {
         config.push(event);
     }
 
@@ -349,7 +348,7 @@ export function generateConfig(): Array<ReleaseEvent> {
                     x: CONSTANTS.originX - 95 + (j % 4) * 30,
                     y: -50,
                     velocity: new Phaser.Math.Vector2(0, 200),
-                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 190, // >> 0 for integer division
+                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 260, // >> 0 for integer division
                     type: "letter",
                     textConfig: { text: diag5[j % 2], fontSize: 58 },
                 });
@@ -358,7 +357,7 @@ export function generateConfig(): Array<ReleaseEvent> {
                     x: CONSTANTS.originX + 30 + (j % 4) * 30,
                     y: -50,
                     velocity: new Phaser.Math.Vector2(0, 200),
-                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 190,
+                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 260,
                     type: "letter",
                     textConfig: { text: diag5[j % 2], fontSize: 58 },
                 });
@@ -371,7 +370,6 @@ export function generateConfig(): Array<ReleaseEvent> {
     const diag6 = ["♡", "✪"];
     const MAX_X = 30;
     for (let i = 0; i < 11; i++) {
-
         // generates pattern 0 1 2 3 4 3 2 1... repeating
         let direction = i % 8;
         if (direction > 4) {
@@ -379,7 +377,7 @@ export function generateConfig(): Array<ReleaseEvent> {
         }
 
         for (let j = 0; j < 30; j++) {
-            config.push({ x: -190 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(-MAX_X + (direction * MAX_X/2), 200), time: START14b + HALF_MEASURE * i, type: "letter", enemyConfig: {skipCollision: [true, false, true, true]}, textConfig: { text: diag6[j % diag6.length], fontSize: 40 } });
+            config.push({ x: -190 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(-MAX_X + (direction * MAX_X) / 2, 200), time: START14b + HALF_MEASURE * i, type: "letter", enemyConfig: { skipCollision: [true, false, true, true] }, textConfig: { text: diag6[j % diag6.length], fontSize: 40 } });
         }
     }
 
@@ -389,7 +387,8 @@ export function generateConfig(): Array<ReleaseEvent> {
     const NUM_PER_WAVE3 = 4;
     for (let i = 0; i < 6; i++) {
         for (let j = 0; j < NUM_PER_WAVE3; j++) {
-            if (i >= 2 || j % 2 === 0) { // start with only 2 the first few waves to ease player into it
+            if (i >= 2 || j % 2 === 0) {
+                // start with only 2 the first few waves to ease player into it
                 config.push({
                     x: CONSTANTS.originX - X_RANGE3 / 2 + j * (X_RANGE3 / NUM_PER_WAVE3) + X_RANGE3 / NUM_PER_WAVE3 / 2,
                     y: -50,
