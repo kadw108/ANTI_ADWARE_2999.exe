@@ -15,10 +15,10 @@ export default class GameMain extends Phaser.Scene {
     rectangleLimit: [number, number, number, number];
 
     hpText: Phaser.GameObjects.Text;
-
     performanceScoreText: Phaser.GameObjects.Text;
-    performanceDecreaseEvent: Phaser.Time.TimerEvent;
     performanceScore: number;
+    performanceScoreChangeText: Phaser.GameObjects.Text;
+    performanceScoreChangeNumber: number; // change queue, like an enemy's hitNum
 
     gameOverGroup: Phaser.GameObjects.Group;
 
@@ -64,29 +64,21 @@ export default class GameMain extends Phaser.Scene {
             this.playerBulletHitEnemy(bullet as PlayerBullet, enemy as EnemyAbstract);
         });
 
-        this.hpText = this.add.text(10, 20, "", { fontFamily: "DisplayFont", fontSize: 40, color: "#ffffff" });
+        this.hpText = this.add.text(10, 20, "", { fontFamily: "DisplayFont", fontSize: 40, color: "#ffffff", backgroundColor: "#00000044", stroke: "#203c5b", strokeThickness: 6, shadow: { offsetX: 2, offsetY: 2, color: "#66ccff", blur: 4, stroke: true, fill: false } });
         this.hpText.setOrigin(0, 0);
-        this.hpText.setStroke("#203c5b", 6);
-        this.hpText.setShadow(2, 2, "#66ccff", 4, true, false);
-        this.hpText.text = "HP: " + this.player.currentHP + "/" + this.player.maxHP;
         this.hpText.depth = 3;
+        this.hpText.text = "HP: " + this.player.currentHP + "/" + this.player.maxHP;
 
-        this.performanceScore = 5000;
-        this.performanceScoreText = this.add.text(CONSTANTS.width - 10, 20, "", { fontFamily: "DisplayFont", fontSize: 30, color: "#ffffff" });
+        this.performanceScore = 0;
+        this.performanceScoreText = this.add.text(CONSTANTS.width - 10, 20, "", { fontFamily: "DisplayFont", fontSize: 30, color: "#ffffff", backgroundColor: "#00000044", stroke: "#203c5b", strokeThickness: 6, shadow: { offsetX: 2, offsetY: 2, color: "#66ccff", blur: 4, stroke: true, fill: false } });
         this.performanceScoreText.setOrigin(1, 0);
-        this.performanceScoreText.setStroke("#203c5b", 6);
-        this.performanceScoreText.setShadow(2, 2, "#66ccff", 4, true, false);
         this.performanceScoreText.depth = 3;
         this.updatePerformance();
 
-        this.performanceDecreaseEvent = this.time.addEvent({
-            delay: 80,
-            loop: true,
-            callback: () => {
-                this.performanceScore -= 1;
-                this.updatePerformance();
-            },
-        });
+        this.performanceScoreChangeText = this.add.text(CONSTANTS.width - 10, 55, "", { fontFamily: "DisplayFont", fontSize: 28, color: "#ffffff", backgroundColor: "#00000044", stroke: "#203c5b", strokeThickness: 3, shadow: { offsetX: 1, offsetY: 1, color: "#66ccff", blur: 4, stroke: true, fill: false } });
+        this.performanceScoreChangeText.setOrigin(1, 0);
+        this.performanceScoreChangeText.depth = 3;
+        this.performanceScoreChangeNumber = 0;
 
         const gameOverRect = this.add.rectangle(CONSTANTS.originX, CONSTANTS.originY, CONSTANTS.width, CONSTANTS.height, 0x0000ff);
         gameOverRect.depth = 4;
@@ -112,6 +104,7 @@ export default class GameMain extends Phaser.Scene {
         if (bullet.active && enemy.active && enemy.canHit) {
             bullet.kill();
             enemy.hit();
+            this.changePerformanceEvent("Hit Enemy", CONSTANTS.playerHitEnemyPointGain);
         }
     }
 
@@ -122,23 +115,43 @@ export default class GameMain extends Phaser.Scene {
     }
 
     updatePerformance(): void {
-        this.performanceScoreText.text = "Employee Performance: " + this.performanceScore;
+        this.performanceScoreText.text = "Performance: " + this.performanceScore;
+    }
+
+    changePerformanceEvent(text: string, pointChange: number): void {
+        let changeModifier: string = "";
+        if (pointChange > 0) {
+            changeModifier = "+";
+            this.performanceScoreChangeText.setColor("#22ff22");
+        }
+        else if (pointChange < 0) {
+            this.performanceScoreChangeText.setColor("#ff2222");
+        }
+
+        this.performanceScoreChangeText.text = text.toUpperCase() + ": " + changeModifier + pointChange;
+        this.performanceScore += pointChange;
+        this.updatePerformance();
+        this.performanceScoreChangeNumber++;
+
+        this.time.delayedCall(1000, () => {
+            this.performanceScoreChangeNumber--;
+            if (this.performanceScoreChangeNumber === 0) {
+                this.performanceScoreChangeText.text = "";
+
+                // this.performanceScoreChangeText.setColor("#ffffff");
+                // not using since every event should be a positive or negative one
+            }
+        });
     }
 
     update(): void {
         this.player.update();
         this.enemyGroup.updateAll();
-
-        if (this.performanceScore <= 0) {
-            this.gameOver();
-        }
     }
 
     gameOver(): void {
         this.sound.stopAll();
         // this.sound.play("gameover");
-
-        this.performanceDecreaseEvent.destroy();
 
         this.enemyGroup.stop();
         this.playerBulletGroup.stop();
