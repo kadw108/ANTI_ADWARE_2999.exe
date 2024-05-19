@@ -22,6 +22,8 @@ export default class GameMain extends Phaser.Scene {
 
     gameOverGroup: Phaser.GameObjects.Group;
 
+    wearyWillow: Phaser.Sound.NoAudioSound | Phaser.Sound.WebAudioSound | Phaser.Sound.HTML5AudioSound;
+
     constructor() {
         super("GameMain");
 
@@ -67,12 +69,14 @@ export default class GameMain extends Phaser.Scene {
         this.hpText.setStroke("#203c5b", 6);
         this.hpText.setShadow(2, 2, "#66ccff", 4, true, false);
         this.hpText.text = "HP: " + this.player.currentHP + "/" + this.player.maxHP;
+        this.hpText.depth = 3;
 
         this.performanceScore = 5000;
         this.performanceScoreText = this.add.text(CONSTANTS.width - 10, 20, "", { fontFamily: "DisplayFont", fontSize: 30, color: "#ffffff" });
         this.performanceScoreText.setOrigin(1, 0);
         this.performanceScoreText.setStroke("#203c5b", 6);
         this.performanceScoreText.setShadow(2, 2, "#66ccff", 4, true, false);
+        this.performanceScoreText.depth = 3;
         this.updatePerformance();
 
         this.performanceDecreaseEvent = this.time.addEvent({
@@ -94,8 +98,7 @@ export default class GameMain extends Phaser.Scene {
         this.gameOverGroup = this.add.group([gameOverRect, gameOverText, subtitle]);
         this.gameOverGroup.setVisible(false);
 
-        const wearyWillow = this.sound.add("wearyWillow", { loop: true, delay: 10 });
-        wearyWillow.play();
+        this.wearyWillow = this.sound.add("wearyWillow", { loop: false, delay: 10 });
 
         this.start();
     }
@@ -113,6 +116,7 @@ export default class GameMain extends Phaser.Scene {
     }
 
     start(): void {
+        this.wearyWillow.play();
         this.player.start();
         this.enemyGroup.start();
     }

@@ -10,6 +10,7 @@ import { CONSTANTS } from './CONSTANTS_FILE';
 const configObject: Phaser.Types.Core.GameConfig = {
     scale: {
         mode: Phaser.Scale.NONE,
+        zoom: 1.25,
         autoCenter: Phaser.Scale.CENTER_BOTH,
         parent: 'thegame',
         width: CONSTANTS.width,

@@ -76,7 +76,13 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
 
         if (initialVelocity !== undefined) {
             this.dynamicBody.setVelocity(initialVelocity.x, initialVelocity.y);
-            this.skipCollision = [initialVelocity.y > 0, initialVelocity.y < 0, initialVelocity.x > 0, initialVelocity.x > 0];
+
+            if (enemyConfig !== undefined && enemyConfig.skipCollision !== undefined) {
+                this.skipCollision = enemyConfig.skipCollision;
+            }
+            else {
+                this.skipCollision = [initialVelocity.y > 0, initialVelocity.y < 0, initialVelocity.x > 0, initialVelocity.x > 0];
+            }
         }
 
         this.setActive(true);
@@ -152,14 +158,14 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
 export class Enemy extends EnemyAbstract {
     constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
         super(scene, type, velocity);
-
-        this.scaleX = type.width;
-        this.scaleY = type.height;
     }
 
     start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig) {
         super.start(x, y, initialVelocity, enemyConfig);
 
+
+        this.scaleX = this.enemyType.width;
+        this.scaleY = this.enemyType.height;
         if (enemyConfig !== undefined) {
             if (enemyConfig.width !== undefined) {
                 this.scaleX = enemyConfig.width;
@@ -236,14 +242,13 @@ export class CircleEnemy extends EnemyAbstract {
         super(scene, type, velocity);
 
         this.setTexture("circle");
-
-        this.scale = type.width / 50;
-        this.setCircle(type.width);
     }
 
     start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig) {
         super.start(x, y, initialVelocity, enemyConfig);
 
+        this.scale = this.enemyType.width / 50;
+        this.setCircle(this.enemyType.width);
         if (enemyConfig !== undefined && enemyConfig.width !== undefined) {
             this.scale = enemyConfig.width / 50;
             this.setCircle(enemyConfig.width);
@@ -286,12 +291,16 @@ export class BoomerangEnemy extends Enemy {
         this.stayEvent = this.scene.time.delayedCall(boomerangConfig.stayTime, () => {
             this.dynamicBody.velocity.set(0);
         });
-        if (boomerangConfig.fireMissile !== undefined) {
-            const timeBetweenFire = boomerangConfig.reverseTime / boomerangConfig.fireMissile;
+        if (boomerangConfig.missileCount !== undefined && boomerangConfig.missileCount > 0) {
+            const WAIT_BEFORE_FIRE = 500;
+            if (boomerangConfig.reverseTime <= WAIT_BEFORE_FIRE) {
+                console.log("Boomerang that fires projectiles does not have enough time to give warning.", boomerangConfig);
+            }
+            const timeBetweenFire = (boomerangConfig.reverseTime - WAIT_BEFORE_FIRE) / boomerangConfig.missileCount;
 
-            for (let i = 0; i < boomerangConfig.fireMissile; i++) {
+            for (let i = 0; i < boomerangConfig.missileCount; i++) {
                 this.fireEvents.push(
-                    this.scene.time.delayedCall(boomerangConfig.stayTime + timeBetweenFire * i, () => {
+                    this.scene.time.delayedCall(boomerangConfig.stayTime + WAIT_BEFORE_FIRE + timeBetweenFire * i, () => {
                         const homingEnemyType = { width: 20, height: 20, hp: 1 };
                         const homingEnemy = new HomingEnemy(this.scene, homingEnemyType, new Phaser.Math.Vector2(0, 0));
                         this.scene.enemyGroup.add(homingEnemy);

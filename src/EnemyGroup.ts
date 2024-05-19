@@ -12,7 +12,7 @@ export type BoomerangConfig = {
     stayTime: number;
     reverseTime: number; // additive onto stayTime, i.e. relative not absolute
     newVelocity?: Phaser.Math.Vector2; // if undefined, it's the reverse of the original velocity,
-    fireMissile?: number; // number of missiles enemy should fire at player while unmoving; undefined = 0
+    missileCount?: number; // number of missiles enemy should fire at player while unmoving; undefined = 0
 };
 
 export type EnemyType = {
@@ -27,6 +27,7 @@ export type EnemyConfig = {
     height?: number;
     hp?: number;
     counterClockwise?: number; // number of 90 degree counterclockwise rotations. 0 to 3; number > 3 will be % 4
+    skipCollision?: [boolean, boolean, boolean, boolean]; // whether to skip collision if out of bounds on up/down/left/right side; if not undefined, overrides default skipCollision which is automatically determined by starting velocity
 }
 
 export type ReleaseEvent = {
@@ -52,6 +53,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             "1": { width: 50, height: 50, hp: 1 },
             "2": { width: 18, height: 18, hp: 1 },
             "3": { width: CONSTANTS.width, height: 2, hp: 1 },
+            bigBlock: { width: 400, height: 150, hp: -1 },
             wavy: { width: CONSTANTS.width, height: 9, hp: -1 },
             blocky: { width: CONSTANTS.width, height: 9, hp: -1 },
             word: { width: -1, height: -1, hp: 4, text: true },
