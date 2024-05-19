@@ -106,11 +106,11 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
             this.scene.sound.play("sfxHurt");
 
             this.currentHP--;
-            this.scene.hpText.text = "HP: " + this.currentHP + "/" + this.maxHP;
+            this.scene.updateHP();
 
-            if (this.currentHP <= 0) {
+            /* if (this.currentHP <= 0) {
                 this.scene.gameOver();
-            }
+            } */
 
             this.scene.time.delayedCall(CONSTANTS.playerHitCooldown, () => {
                 this.clearTint();

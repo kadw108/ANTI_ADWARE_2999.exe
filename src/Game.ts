@@ -67,7 +67,7 @@ export default class GameMain extends Phaser.Scene {
         this.hpText = this.add.text(10, 20, "", { fontFamily: "DisplayFont", fontSize: 40, color: "#ffffff", backgroundColor: "#00000044", stroke: "#203c5b", strokeThickness: 6, shadow: { offsetX: 2, offsetY: 2, color: "#66ccff", blur: 4, stroke: true, fill: false } });
         this.hpText.setOrigin(0, 0);
         this.hpText.depth = 3;
-        this.hpText.text = "HP: " + this.player.currentHP + "/" + this.player.maxHP;
+        this.updateHP();
 
         this.performanceScore = 0;
         this.performanceScoreText = this.add.text(CONSTANTS.width - 10, 20, "", { fontFamily: "DisplayFont", fontSize: 30, color: "#ffffff", backgroundColor: "#00000044", stroke: "#203c5b", strokeThickness: 6, shadow: { offsetX: 2, offsetY: 2, color: "#66ccff", blur: 4, stroke: true, fill: false } });
@@ -75,7 +75,7 @@ export default class GameMain extends Phaser.Scene {
         this.performanceScoreText.depth = 3;
         this.updatePerformance();
 
-        this.performanceScoreChangeText = this.add.text(CONSTANTS.width - 10, 55, "", { fontFamily: "DisplayFont", fontSize: 28, color: "#ffffff", backgroundColor: "#00000044", stroke: "#203c5b", strokeThickness: 3, shadow: { offsetX: 1, offsetY: 1, color: "#66ccff", blur: 4, stroke: true, fill: false } });
+        this.performanceScoreChangeText = this.add.text(CONSTANTS.width - 10, 55, "", { fontFamily: "DisplayFont", fontSize: 30, color: "#ffffff", backgroundColor: "#00000044", shadow: { offsetX: 1, offsetY: 1, color: "#66ccff", blur: 4, stroke: true, fill: false } });
         this.performanceScoreChangeText.setOrigin(1, 0);
         this.performanceScoreChangeText.depth = 3;
         this.performanceScoreChangeNumber = 0;
@@ -112,6 +112,11 @@ export default class GameMain extends Phaser.Scene {
         this.wearyWillow.play();
         this.player.start();
         this.enemyGroup.start();
+    }
+
+    updateHP(): void {
+        // this.hpText.text = "HP: " + this.player.currentHP + "/" + this.player.maxHP;
+        this.hpText.text = "";
     }
 
     updatePerformance(): void {

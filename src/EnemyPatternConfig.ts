@@ -255,17 +255,17 @@ export function generateConfig(): Array<ReleaseEvent> {
                 time: START7 + i * MEASURE,
                 type: "boomerang",
                 enemyConfig: { height: 35, width: 35, hp: 1 },
-                boomerangConfig: { stayTime: HALF_MEASURE, reverseTime: HALF_MEASURE + j * 30, missileCount: 2 },
+                boomerangConfig: { stayTime: HALF_MEASURE, reverseTime: HALF_MEASURE + j * 30, missileCount: 1 },
             });
         }
     }
 
     // diagonal circles (small; weave between)
     for (let i = 0; i < 25; i++) {
-        for (let j = 0; j < 24; j++) {
+        for (let j = 0; j < 20; j++) {
             if (i % 2 === 0) {
                 config.push({
-                    x: 0 + j * 38,
+                    x: 0 + j * 45,
                     y: -50,
                     velocity: new Phaser.Math.Vector2(0, 200),
                     time: START7 + HALF_MEASURE * i + 35 * j,
@@ -273,7 +273,7 @@ export function generateConfig(): Array<ReleaseEvent> {
                 });
             } else {
                 config.push({
-                    x: CONSTANTS.width - j * 38,
+                    x: CONSTANTS.width - j * 45,
                     y: -50,
                     velocity: new Phaser.Math.Vector2(0, 200),
                     time: START7 + HALF_MEASURE * i + 35 * j,
