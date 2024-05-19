@@ -251,7 +251,7 @@ export class CircleEnemy extends EnemyAbstract {
         if (enemyConfig !== undefined && enemyConfig.width !== undefined) {
             newWidth = enemyConfig.width;
         }
-        this.setCircle(newWidth);
+        this.setCircle(newWidth/2);
     }
 }
 
@@ -293,7 +293,7 @@ export class BoomerangEnemy extends EnemyAbstract {
             this.stop();
             this.setTexture("atlas1", "boomerangSmall.png");
         }
-        this.setCircle(newWidth);
+        this.setCircle(newWidth/2);
 
         let newVelocity: Phaser.Math.Vector2;
         if (boomerangConfig.newVelocity === undefined) {

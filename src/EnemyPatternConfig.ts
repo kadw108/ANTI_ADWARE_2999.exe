@@ -255,7 +255,7 @@ export function generateConfig(): Array<ReleaseEvent> {
                 time: START7 + i * MEASURE,
                 type: "boomerang",
                 enemyConfig: { height: 35, width: 35, hp: 1 },
-                boomerangConfig: { stayTime: HALF_MEASURE, reverseTime: HALF_MEASURE + j * 30, missileCount: 4 },
+                boomerangConfig: { stayTime: HALF_MEASURE, reverseTime: HALF_MEASURE + j * 30, missileCount: 2 },
             });
         }
     }
@@ -265,7 +265,7 @@ export function generateConfig(): Array<ReleaseEvent> {
         for (let j = 0; j < 24; j++) {
             if (i % 2 === 0) {
                 config.push({
-                    x: 0 + j * 33,
+                    x: 0 + j * 38,
                     y: -50,
                     velocity: new Phaser.Math.Vector2(0, 200),
                     time: START7 + HALF_MEASURE * i + 35 * j,
@@ -273,7 +273,7 @@ export function generateConfig(): Array<ReleaseEvent> {
                 });
             } else {
                 config.push({
-                    x: CONSTANTS.width - j * 33,
+                    x: CONSTANTS.width - j * 38,
                     y: -50,
                     velocity: new Phaser.Math.Vector2(0, 200),
                     time: START7 + HALF_MEASURE * i + 35 * j,
@@ -342,13 +342,13 @@ export function generateConfig(): Array<ReleaseEvent> {
     const START14 = START0 + 463 * BEAT;
     // blocks of letters - keep this one
     for (let i = 0; i < 13; i++) {
-        for (let j = 0; j < 12; j++) {
+        for (let j = 0; j < 16; j++) {
             if (i % 2 === 0) {
                 config.push({
                     x: CONSTANTS.originX - 95 + (j % 4) * 30,
                     y: -50,
                     velocity: new Phaser.Math.Vector2(0, 200),
-                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 190, // >> 0 for integer division
+                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 100, // >> 0 for integer division
                     type: "letter",
                     textConfig: { text: diag5[j % 2], fontSize: 58 },
                 });
@@ -357,7 +357,7 @@ export function generateConfig(): Array<ReleaseEvent> {
                     x: CONSTANTS.originX + 30 + (j % 4) * 30,
                     y: -50,
                     velocity: new Phaser.Math.Vector2(0, 200),
-                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 190,
+                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 100,
                     type: "letter",
                     textConfig: { text: diag5[j % 2], fontSize: 58 },
                 });
@@ -368,7 +368,7 @@ export function generateConfig(): Array<ReleaseEvent> {
     // horizontal walls, moving slightly
     const START14b = START0 + 491 * BEAT;
     const diag6 = ["♡", "✪"];
-    const MAX_X = 30;
+    const MAX_X = 20;
     for (let i = 0; i < 11; i++) {
         // generates pattern 0 1 2 3 4 3 2 1... repeating
         let direction = i % 8;
@@ -387,8 +387,7 @@ export function generateConfig(): Array<ReleaseEvent> {
     const NUM_PER_WAVE3 = 4;
     for (let i = 0; i < 6; i++) {
         for (let j = 0; j < NUM_PER_WAVE3; j++) {
-            if (i >= 2 || j % 2 === 0) {
-                // start with only 2 the first few waves to ease player into it
+            if ((i % 2 === 0 && j % 2 === 0) || (i % 2 !== 0 && j % 2 !== 0)) {
                 config.push({
                     x: CONSTANTS.originX - X_RANGE3 / 2 + j * (X_RANGE3 / NUM_PER_WAVE3) + X_RANGE3 / NUM_PER_WAVE3 / 2,
                     y: -50,
