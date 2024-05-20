@@ -19,7 +19,7 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
     skipCollision: [boolean, boolean, boolean, boolean]; // whether to skip collision: up down left right
 
     // velocity needed so we can determine which edge the enemy SHOULDN'T be destroyed on collision with.
-    constructor(scene: GameMain, type: EnemyType, initialVelocity: Phaser.Math.Vector2) {
+    constructor(scene: GameMain, type: EnemyType) {
         super(scene, 0, 0, "squareSmall");
         this.setOrigin(0.5);
         this.scene = scene;
@@ -46,7 +46,7 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
         this.currentHp = this.maxHP;
     }
 
-    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig) {
+    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig, boomerangConfig?: BoomerangConfig) {
         if (enemyConfig !== undefined && enemyConfig.hp !== undefined) {
             this.setHp(enemyConfig.hp);
         } else {
@@ -156,11 +156,11 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
 }
 
 export class Enemy extends EnemyAbstract {
-    constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
-        super(scene, type, velocity);
+    constructor(scene: GameMain, type: EnemyType) {
+        super(scene, type);
     }
 
-    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig) {
+    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig, boomerangConfig? :BoomerangConfig) {
         super.start(x, y, initialVelocity, enemyConfig);
 
 
@@ -178,7 +178,7 @@ export class Enemy extends EnemyAbstract {
 }
 
 export class LineEnemy extends EnemyAbstract {
-    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig) {
+    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig, boomerangConfig?: BoomerangConfig) {
         super.start(x, y, initialVelocity, enemyConfig);
 
         // IMPORTANT: dynamicBody.setSize must be called after this.play(animation)
@@ -212,8 +212,8 @@ export class LineEnemy extends EnemyAbstract {
 }
 
 export class WavyEnemy extends LineEnemy {
-    constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
-        super(scene, type, velocity);
+    constructor(scene: GameMain, type: EnemyType) {
+        super(scene, type);
         this.play("wavy");
     }
 
@@ -225,8 +225,8 @@ export class WavyEnemy extends LineEnemy {
 }
 
 export class BlockyEnemy extends LineEnemy {
-    constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
-        super(scene, type, velocity);
+    constructor(scene: GameMain, type: EnemyType) {
+        super(scene, type);
         this.play("blocky");
     }
 
@@ -238,13 +238,13 @@ export class BlockyEnemy extends LineEnemy {
 }
 
 export class CircleEnemy extends EnemyAbstract {
-    constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
-        super(scene, type, velocity);
+    constructor(scene: GameMain, type: EnemyType) {
+        super(scene, type);
 
         this.setTexture("atlas1", "circle.png");
     }
 
-    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig) {
+    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig, boomerangConfig?: BoomerangConfig) {
         super.start(x, y, initialVelocity, enemyConfig);
 
         let newWidth = this.enemyType.width;
@@ -260,8 +260,8 @@ export class BoomerangEnemy extends EnemyAbstract {
     fireEvents: Array<Phaser.Time.TimerEvent>;
     reverseEvent: Phaser.Time.TimerEvent | undefined;
 
-    constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
-        super(scene, type, velocity);
+    constructor(scene: GameMain, type: EnemyType) {
+        super(scene, type);
 
         // leave them undefined for now
         /*
@@ -316,8 +316,8 @@ export class BoomerangEnemy extends EnemyAbstract {
                 this.fireEvents.push(
                     this.scene.time.delayedCall(boomerangConfig.stayTime + WAIT_BEFORE_FIRE + timeBetweenFire * i, () => {
                         const homingEnemyType = { width: 20, height: 20, hp: 1 };
-                        const homingEnemy = new HomingEnemy(this.scene, homingEnemyType, new Phaser.Math.Vector2(0, 0));
-                        this.scene.enemyGroup.add(homingEnemy);
+                        const homingEnemy = new HomingEnemy(this.scene, homingEnemyType);
+                        this.scene.enemyGroupManager.add(homingEnemy);
                         homingEnemy.start(this.x, this.y, undefined);
                     })
                 );
@@ -341,13 +341,13 @@ export class BoomerangEnemy extends EnemyAbstract {
 }
 
 export class HomingEnemy extends EnemyAbstract {
-    constructor(scene: GameMain, type: EnemyType, velocity: Phaser.Math.Vector2) {
-        super(scene, type, velocity);
+    constructor(scene: GameMain, type: EnemyType) {
+        super(scene, type);
 
         this.setTexture("atlas1", "homing.png");
     }
 
-    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig) {
+    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig, boomerangConfig?: BoomerangConfig) {
         super.start(x, y, initialVelocity!, enemyConfig);
 
         let collisionWidth = this.enemyType.width;
@@ -371,8 +371,13 @@ export class TextEnemy extends EnemyAbstract {
     bitmapText: Phaser.GameObjects.BitmapText;
     text: string;
 
-    constructor(scene: GameMain, type: EnemyType, textConfig: TextConfig, initialVelocity: Phaser.Math.Vector2) {
-        super(scene, type, initialVelocity);
+    constructor(scene: GameMain, type: EnemyType, textConfig?: TextConfig) {
+        super(scene, type);
+
+        if (textConfig === undefined) {
+            console.error("TextEnemy constructor: textConfig is undefined.");
+            return;
+        }
 
         this.bitmapText = new Phaser.GameObjects.BitmapText(scene, 0, 0, "DisplayFont", textConfig.text, textConfig.fontSize);
         this.bitmapText.setOrigin(0.5);
@@ -383,7 +388,7 @@ export class TextEnemy extends EnemyAbstract {
         this.text = this.bitmapText.text;
     }
 
-    start(x: number, y: number, velocity: Phaser.Math.Vector2, enemyConfig?: EnemyConfig) {
+    start(x: number, y: number, velocity: Phaser.Math.Vector2, enemyConfig?: EnemyConfig, boomerangConfig?: BoomerangConfig) {
         super.start(x, y, velocity, enemyConfig);
 
         if (enemyConfig !== undefined) {
@@ -417,8 +422,13 @@ export class TextEnemy extends EnemyAbstract {
 }
 
 export class LetterEnemy extends TextEnemy {
-    constructor(scene: GameMain, type: EnemyType, textConfig: TextConfig, initialVelocity: Phaser.Math.Vector2) {
-        super(scene, type, textConfig, initialVelocity);
+    constructor(scene: GameMain, type: EnemyType, textConfig?: TextConfig) {
+        super(scene, type, textConfig);
+
+        if (textConfig === undefined) {
+            console.error("LetterEnemy constructor: textConfig is undefined.");
+            return;
+        }
 
         if (textConfig.text.length !== 1) {
             console.error("Character length of LetterEnemy is not 1!");

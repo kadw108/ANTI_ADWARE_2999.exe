@@ -1,6 +1,6 @@
 import Player from "./Player";
 import { EnemyAbstract } from "./Enemy";
-import { EnemyGroup } from "./EnemyGroup";
+import { EnemyGroupManager } from "./EnemyGroup";
 import { PlayerBullet, PlayerBulletGroup } from "./PlayerBullet";
 
 import { CONSTANTS } from "./CONSTANTS_FILE";
@@ -9,7 +9,7 @@ export default class GameMain extends Phaser.Scene {
     // player: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
     player: Player;
 
-    enemyGroup: EnemyGroup;
+    enemyGroupManager: EnemyGroupManager;
     playerBulletGroup: PlayerBulletGroup;
 
     rectangleLimit: [number, number, number, number];
@@ -44,7 +44,7 @@ export default class GameMain extends Phaser.Scene {
         this.player.dynamicBody.setBoundsRectangle(boundsRect);
 
         // groups
-        this.enemyGroup = new EnemyGroup(this);
+        this.enemyGroupManager = new EnemyGroupManager(this);
         this.playerBulletGroup = new PlayerBulletGroup(this);
 
         // collision
@@ -58,8 +58,8 @@ export default class GameMain extends Phaser.Scene {
         });
 
         // @ts-ignore
-        this.physics.add.overlap(this.player, this.enemyGroup, (player, enemy) => this.playerHitEnemy(player as Player, enemy as EnemyAbstract));
-        this.physics.add.overlap(this.playerBulletGroup, this.enemyGroup, (bullet, enemy) => {
+        this.physics.add.overlap(this.player, this.enemyGroupManager, (player, enemy) => this.playerHitEnemy(player as Player, enemy as EnemyAbstract));
+        this.physics.add.overlap(this.playerBulletGroup, this.enemyGroupManager, (bullet, enemy) => {
             // @ts-ignore
             this.playerBulletHitEnemy(bullet as PlayerBullet, enemy as EnemyAbstract);
         });
@@ -111,7 +111,7 @@ export default class GameMain extends Phaser.Scene {
     start(): void {
         this.wearyWillow.play();
         this.player.start();
-        this.enemyGroup.start();
+        this.enemyGroupManager.start();
     }
 
     updateHP(): void {
@@ -151,14 +151,14 @@ export default class GameMain extends Phaser.Scene {
 
     update(): void {
         this.player.update();
-        this.enemyGroup.updateAll();
+        this.enemyGroupManager.updateAll();
     }
 
     gameOver(): void {
         this.sound.stopAll();
         // this.sound.play("gameover");
 
-        this.enemyGroup.stop();
+        this.enemyGroupManager.stop();
         this.playerBulletGroup.stop();
         this.player.die();
 
