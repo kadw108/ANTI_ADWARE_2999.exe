@@ -17,7 +17,8 @@ export default class Preloader extends Phaser.Scene {
         this.load.audio("sfxDestroy2", ["assets/sfx_destroy2.wav"]);
         this.load.audio("sfxFire", ["assets/sfx_fire.wav"]);
         this.load.audio("sfxHurt", ["assets/sfx_hurt.wav"]);
-        this.load.audio("wearyWillow", ["assets/wearyWillow.mp3", "assets/wearyWillow.ogg"]);
+        this.load.audio("wearyWillow", ["assets/wearyWillow.ogg", "assets/wearyWillow.mp3"]);
+        this.load.audio("posthuman", ["assets/posthuman.ogg", "assets/posthuman.mp3"]);
 
         this.load.bitmapFont("DisplayFont", "assets/VT323Bitmap.png", "assets/VT323Bitmap.xml");
 

@@ -21,7 +21,7 @@ export default class Tutorial extends Phaser.Scene {
         const lines3 = this.add.text(CONSTANTS.originX, CONSTANTS.originY + 105, "Blocky lines hurt only if you ARE moving.", { fontFamily: "DisplayFont", fontSize: 30, color: "#ffffff" });
         lines3.setOrigin(0.5, 0);
 
-        const lines4 = this.add.text(CONSTANTS.originX, CONSTANTS.originY + 170, "We hope you are provided with a strong SENSE OF PRIDE\nAND ACCOMPLISHMENT for performing your civic duties.", { fontFamily: "DisplayFont", fontSize: 30, color: "#ffffff" });
+        const lines4 = this.add.text(CONSTANTS.originX, CONSTANTS.originY + 170, "Please keep this tab in focus while playing,\nor the music may go out of sync.", { fontFamily: "DisplayFont", fontSize: 30, color: "#ffffff" });
         lines4.setOrigin(0.5, 0);
 
         const subtitle = this.add.text(CONSTANTS.originX, CONSTANTS.originY + 265, "CLICK ANYWHERE TO RETURN", { fontFamily: "DisplayFont", fontSize: 40, color: "#ffffff" });

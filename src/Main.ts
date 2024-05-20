@@ -5,6 +5,7 @@ import GameMain from "./Game";
 import Menu from "./Menu";
 import EndScreen from "./EndScreen";
 import Tutorial from "./Tutorial";
+import Credits from "./Credits";
 
 import { CONSTANTS } from "./CONSTANTS_FILE";
 
@@ -20,7 +21,7 @@ const configObject: Phaser.Types.Core.GameConfig = {
         width: CONSTANTS.width,
         height: CONSTANTS.height,
     },
-    scene: [Preloader, Menu, Tutorial, GameMain, EndScreen],
+    scene: [Preloader, Menu, Credits, Tutorial, GameMain, EndScreen],
     physics: {
         default: "arcade",
     },
