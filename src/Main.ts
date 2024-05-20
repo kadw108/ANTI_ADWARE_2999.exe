@@ -4,6 +4,7 @@ import Preloader from "./Preloader";
 import GameMain from "./Game";
 import Menu from "./Menu";
 import EndScreen from "./EndScreen";
+import Tutorial from "./Tutorial";
 
 import { CONSTANTS } from "./CONSTANTS_FILE";
 
@@ -19,11 +20,12 @@ const configObject: Phaser.Types.Core.GameConfig = {
         width: CONSTANTS.width,
         height: CONSTANTS.height,
     },
-    scene: [Preloader, Menu, GameMain, EndScreen],
+    scene: [Preloader, Menu, Tutorial, GameMain, EndScreen],
     physics: {
         default: "arcade",
     },
-    transparent: true
+    transparent: true,
+    antialias: false
 
     // type: Phaser.WEBGL,
     // @ts-ignore, see https://github.com/phaserjs/examples/blob/master/public/src/renderer/grayscale%20pipeline.js

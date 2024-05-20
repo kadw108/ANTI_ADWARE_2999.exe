@@ -1,0 +1,35 @@
+import { CONSTANTS } from "./CONSTANTS_FILE";
+
+export default class Tutorial extends Phaser.Scene {
+    constructor() {
+        super("Tutorial");
+    }
+
+    create(): void {
+        const lines = this.add.text(CONSTANTS.originX, 10, "Thank you for CYBERLINKING into ANTI_ADWARE_2999.EXE!\nJUSTISCO CORPORATION [TM] appreciates your dedication\nto combating MALEVOLENT INTERNET ENTITIES.\n\nWetware interface instructions:\n* Arrow keys to move.\n* Space to shoot.\n* Maximize performance.", { fontFamily: "DisplayFont", fontSize: 30, color: "#ffffff" });
+        lines.setOrigin(0.5, 0);
+
+        const wavy = this.add.sprite(CONSTANTS.originX, CONSTANTS.originY - 20, "atlas", "wavy1.png");
+        wavy.play("wavy");
+
+        const lines2 = this.add.text(CONSTANTS.originX, CONSTANTS.originY - 5, "Wavy lines hurt only if you are NOT moving.", { fontFamily: "DisplayFont", fontSize: 30, color: "#ffffff" });
+        lines2.setOrigin(0.5, 0);
+
+        const blocky = this.add.sprite(CONSTANTS.originX, CONSTANTS.originY + 90, "atlas", "blocky1.png");
+        blocky.play("blocky");
+
+        const lines3 = this.add.text(CONSTANTS.originX, CONSTANTS.originY + 105, "Blocky lines hurt only if you ARE moving.", { fontFamily: "DisplayFont", fontSize: 30, color: "#ffffff" });
+        lines3.setOrigin(0.5, 0);
+
+        const lines4 = this.add.text(CONSTANTS.originX, CONSTANTS.originY + 170, "We hope you are provided with a strong SENSE OF PRIDE\nAND ACCOMPLISHMENT for performing your civic duties.", { fontFamily: "DisplayFont", fontSize: 30, color: "#ffffff" });
+        lines4.setOrigin(0.5, 0);
+
+        const subtitle = this.add.text(CONSTANTS.originX, CONSTANTS.originY + 265, "CLICK ANYWHERE TO RETURN", { fontFamily: "DisplayFont", fontSize: 40, color: "#ffffff" });
+        subtitle.setOrigin(0.5, 0.5);
+
+        this.input.once("pointerdown", () => {
+            this.scene.start("Menu");
+        });
+    }
+}
+
