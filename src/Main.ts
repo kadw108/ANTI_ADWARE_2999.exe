@@ -20,7 +20,7 @@ const configObject: Phaser.Types.Core.GameConfig = {
     scene: [ Boot, Preloader, Menu,GameMain ],
     physics: {
         default: "arcade"
-    }
+    },
 };
  
 const game = new Phaser.Game(configObject);

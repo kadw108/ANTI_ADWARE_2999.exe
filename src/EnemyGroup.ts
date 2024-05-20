@@ -28,7 +28,7 @@ export type EnemyConfig = {
     hp?: number;
     counterClockwise?: number; // number of 90 degree counterclockwise rotations. 0 to 3; number > 3 will be % 4
     skipCollision?: [boolean, boolean, boolean, boolean]; // whether to skip collision if out of bounds on up/down/left/right side; if not undefined, overrides default skipCollision which is automatically determined by starting velocity
-}
+};
 
 export type ReleaseEvent = {
     x: number;
@@ -116,8 +116,7 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
             this.add(newEnemy as unknown as Phaser.GameObjects.GameObject);
             if (enemyTypeKey === "boomerang") {
                 (newEnemy as BoomerangEnemy).start(x, y, velocity, enemyConfig, boomerangConfig);
-            }
-            else {
+            } else {
                 newEnemy.start(x, y, velocity, enemyConfig);
             }
         } else {
@@ -137,24 +136,20 @@ export class EnemyGroup extends Phaser.Physics.Arcade.Group {
         const enemyType = this.typeList[enemyTypeKey];
 
         if (enemyType.text === undefined) {
-            for (const child of this.getChildren()) {
-                if (!child.active && (child as Enemy).enemyType === enemyType) {
-                    const newEnemy = child as Enemy;
-
-                    if (enemyTypeKey === "boomerang") {
-                        (newEnemy as BoomerangEnemy).start(x, y, velocity, enemyConfig, boomerangConfig);
-                    } else {
-                        (newEnemy as Enemy).start(x, y, velocity, enemyConfig);
-                    }
-                    return true;
+            const newEnemy = this.getChildren().find((child) => !child.active && (child as Enemy).enemyType === enemyType);
+            if (newEnemy !== undefined) {
+                if (enemyTypeKey === "boomerang") {
+                    (newEnemy as BoomerangEnemy).start(x, y, velocity, enemyConfig, boomerangConfig);
+                } else {
+                    (newEnemy as Enemy).start(x, y, velocity, enemyConfig);
                 }
+                return true;
             }
         } else if (enemyTypeKey === "letter") {
-            for (const child of this.getChildren()) {
-                if (!child.active && (child as Enemy).enemyType === enemyType && (child as LetterEnemy).text === textConfig.text) {
-                    (child as LetterEnemy).restart(x, y, velocity, textConfig.fontSize, enemyConfig);
+            const newEnemy = this.getChildren().find((child) => !child.active && (child as Enemy).enemyType === enemyType && (child as LetterEnemy).text === textConfig.text);
+            if (newEnemy !== undefined) {
+                    (newEnemy as LetterEnemy).restart(x, y, velocity, textConfig.fontSize, enemyConfig);
                     return true;
-                }
             }
         }
 
