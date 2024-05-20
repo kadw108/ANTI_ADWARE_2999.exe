@@ -119,9 +119,8 @@ export default class GameMain extends Phaser.Scene {
 
     start(): void {
         this.wearyWillow.play();
-        // this.time.addEvent({delay: 205000, callback: () => {
         this.time.addEvent({
-            delay: 3050,
+            delay: 205000,
             callback: () => {
                 // this.data.set('performanceScore', this.performanceScore);
                 // this.scene.start("EndScreen", {finalScore: this.performanceScore});

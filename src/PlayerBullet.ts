@@ -1,26 +1,22 @@
 import { CONSTANTS } from "./CONSTANTS_FILE";
 
-export class PlayerBulletGroup extends Phaser.Physics.Arcade.Group
-{
-    constructor (scene: Phaser.Scene)
-    {
+export class PlayerBulletGroup extends Phaser.Physics.Arcade.Group {
+    constructor(scene: Phaser.Scene) {
         super(scene.physics.world, scene);
 
         this.createMultiple({
             frameQuantity: 30,
-            key: 'bullet',
+            key: "bullet",
             active: false,
             visible: false,
-            classType: PlayerBullet
+            classType: PlayerBullet,
         });
     }
 
-    fireBullet (x: number, y: number)
-    {
+    fireBullet(x: number, y: number) {
         let bullet = this.getFirstDead(false);
 
-        if (bullet)
-        {
+        if (bullet) {
             bullet.fire(x, y);
             this.scene.sound.play("sfxFire");
         }
@@ -35,12 +31,10 @@ export class PlayerBulletGroup extends Phaser.Physics.Arcade.Group
     }
 }
 
-export class PlayerBullet extends Phaser.Physics.Arcade.Sprite
-{
+export class PlayerBullet extends Phaser.Physics.Arcade.Sprite {
     dynamicBody: Phaser.Physics.Arcade.Body;
 
-    constructor (scene: Phaser.Scene, x: number, y: number)
-    {
+    constructor(scene: Phaser.Scene, x: number, y: number) {
         super(scene, x, y, "atlas1", "bullet.png");
 
         scene.physics.add.existing(this);
@@ -53,8 +47,7 @@ export class PlayerBullet extends Phaser.Physics.Arcade.Sprite
         this.dynamicBody.setSize(9, 9, false);
     }
 
-    fire (x: number, y: number)
-    {
+    fire(x: number, y: number) {
         this.dynamicBody.reset(x, y);
 
         this.setActive(true);
@@ -63,18 +56,15 @@ export class PlayerBullet extends Phaser.Physics.Arcade.Sprite
         this.setVelocityY(-CONSTANTS.bulletSpeed);
     }
 
-    kill ()
-    {
+    kill() {
         this.setActive(false);
         this.setVisible(false);
     }
 
-    preUpdate (time: number, delta: number)
-    {
+    preUpdate(time: number, delta: number) {
         super.preUpdate(time, delta);
 
-        if (this.y <= -32)
-        {
+        if (this.y <= -32) {
             this.kill();
         }
     }

@@ -2,31 +2,31 @@ const WIDTH = 700;
 const HEIGHT = 600;
 
 type constants = {
-    width: number,
-    height: number,
-    originX: number,
-    originY: number,
+    width: number;
+    height: number;
+    originX: number;
+    originY: number;
 
-    enemySpeed: number,
-    bulletSpeed: number,
+    enemySpeed: number;
+    bulletSpeed: number;
 
-    playerHitPointLoss: number,
-    playerFirePointLoss: number,
-    playerHitEnemyPointGain: number,
+    playerHitPointLoss: number;
+    playerFirePointLoss: number;
+    playerHitEnemyPointGain: number;
 
-    playerShootCooldown: number,
-    playerHitCooldown: number,
-    playerSpeed: number,
-    maxHP: number,
+    playerShootCooldown: number;
+    playerHitCooldown: number;
+    playerSpeed: number;
+    maxHP: number;
 
-    textConfig: Phaser.Types.GameObjects.Text.TextStyle
-}
+    textConfig: Phaser.Types.GameObjects.Text.TextStyle;
+};
 
 export const CONSTANTS: constants = {
     width: WIDTH,
     height: HEIGHT,
-    originX: WIDTH/2,
-    originY: HEIGHT/2,
+    originX: WIDTH / 2,
+    originY: HEIGHT / 2,
 
     enemySpeed: 200,
     bulletSpeed: 250,
@@ -40,5 +40,5 @@ export const CONSTANTS: constants = {
     playerSpeed: 130,
     maxHP: 9999,
 
-    textConfig: { fontFamily: "DisplayFont", fontSize: 40, color: "#ffffff", backgroundColor: "#00000044", stroke: "#203c5b", strokeThickness: 6, shadow: { offsetX: 2, offsetY: 2, color: "#66ccff", blur: 4, stroke: true, fill: false } }
+    textConfig: { fontFamily: "DisplayFont", fontSize: 40, color: "#ffffff", backgroundColor: "#00000044", stroke: "#203c5b", strokeThickness: 6, shadow: { offsetX: 2, offsetY: 2, color: "#66ccff", blur: 4, stroke: true, fill: false } },
 };

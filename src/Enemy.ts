@@ -110,7 +110,7 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
     }
 
     emitDeathParticles() {
-        EnemyAbstract.emitter?.emitParticleAt(this.x, this.y, 10);
+        EnemyAbstract.emitter?.emitParticleAt(this.x, this.y, 6);
     }
 
     killEmitter() {

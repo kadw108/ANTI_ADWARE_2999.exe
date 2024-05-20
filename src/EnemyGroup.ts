@@ -40,7 +40,6 @@ export type ReleaseEvent = {
 };
 
 class EnemyParent extends Phaser.Physics.Arcade.Group {
-
     addEnemy(newEnemy: EnemyAbstract) {
         this.add(newEnemy as unknown as Phaser.GameObjects.GameObject);
         return newEnemy;
@@ -68,21 +67,11 @@ export class EnemyGroupManager extends EnemyParent {
         super(scene.physics.world, scene);
 
         this.typeList = {
-            wavy: new EnemyGroup(scene,
-                { width: CONSTANTS.width, height: 9, hp: -1 },
-                WavyEnemy),
-            blocky: new EnemyGroup(scene,
-                { width: CONSTANTS.width, height: 9, hp: -1 },
-                BlockyEnemy),
-            letter: new LetterEnemyGroup(scene,
-                { width: -1, height: -1, hp: 1, text: true },
-                LetterEnemy),
-            boomerang: new EnemyGroup(scene,
-                { width: 75, height: 75, hp: 999 },
-                BoomerangEnemy),
-            circle: new EnemyGroup(scene,
-                { width: 10, height: -1, hp: -1 },
-                CircleEnemy), // height doesn't matter
+            wavy: new EnemyGroup(scene, { width: CONSTANTS.width, height: 9, hp: -1 }, WavyEnemy),
+            blocky: new EnemyGroup(scene, { width: CONSTANTS.width, height: 9, hp: -1 }, BlockyEnemy),
+            letter: new LetterEnemyGroup(scene, { width: -1, height: -1, hp: 1, text: true }, LetterEnemy),
+            boomerang: new EnemyGroup(scene, { width: 75, height: 75, hp: 999 }, BoomerangEnemy),
+            circle: new EnemyGroup(scene, { width: 10, height: -1, hp: -1 }, CircleEnemy), // height doesn't matter
         };
     }
 
@@ -124,7 +113,7 @@ export class EnemyGroupManager extends EnemyParent {
             if (i === 0) {
                 (children[i] as unknown as EnemyAbstract).killEmitter();
             }
-            
+
             (children[i] as unknown as EnemyAbstract).kill();
         }
 
@@ -132,7 +121,6 @@ export class EnemyGroupManager extends EnemyParent {
             (child as unknown as EnemyAbstract).kill();
         });
     }
-
 }
 
 class EnemyGroup extends EnemyParent {

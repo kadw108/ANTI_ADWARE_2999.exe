@@ -1,6 +1,5 @@
 import "phaser";
 
-import Boot from "./Boot";
 import Preloader from "./Preloader";
 import GameMain from "./Game";
 import Menu from "./Menu";
@@ -20,7 +19,7 @@ const configObject: Phaser.Types.Core.GameConfig = {
         width: CONSTANTS.width,
         height: CONSTANTS.height,
     },
-    scene: [Boot, Preloader, Menu, GameMain, EndScreen],
+    scene: [Preloader, Menu, GameMain, EndScreen],
     physics: {
         default: "arcade",
     },

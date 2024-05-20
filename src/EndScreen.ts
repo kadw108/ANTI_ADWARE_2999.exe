@@ -1,7 +1,6 @@
 import { CONSTANTS } from "./CONSTANTS_FILE";
 
 export default class EndScreen extends Phaser.Scene {
-
     performanceScore: number;
 
     constructor() {
@@ -12,7 +11,7 @@ export default class EndScreen extends Phaser.Scene {
 
         // @ts-ignore
         // this.plugins.get("PassData").performanceScore = this.passData.performanceScore;
-    };
+    }
 
     create(): void {
         // @ts-ignore
@@ -28,11 +27,8 @@ export default class EndScreen extends Phaser.Scene {
         const subtitle2 = this.add.text(CONSTANTS.originX, CONSTANTS.originY + 150, "Click to play again!", CONSTANTS.textConfig);
         subtitle2.setOrigin(0.5, 0.5);
 
-        this.input.once(
-            "pointerdown",
-            () => {
-                this.scene.start("Menu");
-            },
-        );
+        this.input.once("pointerdown", () => {
+            this.scene.start("Menu");
+        });
     }
 }
