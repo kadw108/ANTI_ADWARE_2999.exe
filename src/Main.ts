@@ -7,7 +7,8 @@ import Menu from "./Menu";
 
 import { CONSTANTS } from "./CONSTANTS_FILE";
 
-import GameShader from "./ShaderGray";
+// import GameShader from "./ShaderGray";
+// import FishEyePostFx from 'phaser3-rex-plugins/plugins/fisheyepipeline.js';
 
 const configObject: Phaser.Types.Core.GameConfig = {
     scale: {
@@ -23,9 +24,10 @@ const configObject: Phaser.Types.Core.GameConfig = {
         default: "arcade",
     },
 
-    type: Phaser.WEBGL,
+    // type: Phaser.WEBGL,
     // @ts-ignore, see https://github.com/phaserjs/examples/blob/master/public/src/renderer/grayscale%20pipeline.js
-    pipeline: {"gray": GameShader }
+    // pipeline: {"fisheye": FishEyePostFx }
+    // pipeline: [FishEyePostFx]
 };
 
 new Phaser.Game(configObject);

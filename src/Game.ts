@@ -5,8 +5,7 @@ import { PlayerBullet, PlayerBulletGroup } from "./PlayerBullet";
 
 import { CONSTANTS } from "./CONSTANTS_FILE";
 
-import GameShader from "./ShaderGray";
-// import GrayScalePipeline from "./ShaderGray2";
+import FishEyePostFx from 'phaser3-rex-plugins/plugins/fisheyepipeline.js';
 
 export default class GameMain extends Phaser.Scene {
     // player: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
@@ -72,25 +71,32 @@ export default class GameMain extends Phaser.Scene {
         this.wearyWillow = this.sound.add("wearyWillow", { loop: false, delay: 10 });
         // this.sound.pauseOnBlur = false;
 
+        /*
+        var postFxPlugin = this.plugins.get('rexfisheyepipelineplugin');
+        var postFxPipeline = (postFxPlugin as Phaser.Plugins.BasePlugin).add(this.cameras.main, {
+            radius: 300,
+            mode:'asin'
+        });
         let cam = this.cameras.main;
-        cam.setPostPipeline(GameShader);
+        cam.setPostPipeline(FishEyePostFx);
+        */
 
         this.start();
     }
 
     createText() {
-        this.hpText = this.add.text(10, 20, "", { fontFamily: "DisplayFont", fontSize: 40, color: "#ffffff", backgroundColor: "#00000044", stroke: "#203c5b", strokeThickness: 6, shadow: { offsetX: 2, offsetY: 2, color: "#66ccff", blur: 4, stroke: true, fill: false } });
+        this.hpText = this.add.text(10, 20, "", CONSTANTS.textConfig);
         this.hpText.setOrigin(0, 0);
         this.hpText.depth = 3;
         this.updateHP();
 
         this.performanceScore = 0;
-        this.performanceScoreText = this.add.text(CONSTANTS.width - 10, 20, "", { fontFamily: "DisplayFont", fontSize: 30, color: "#ffffff", backgroundColor: "#00000044", stroke: "#203c5b", strokeThickness: 6, shadow: { offsetX: 2, offsetY: 2, color: "#66ccff", blur: 4, stroke: true, fill: false } });
+        this.performanceScoreText = this.add.text(CONSTANTS.width - 10, 20, "", CONSTANTS.textConfig);
         this.performanceScoreText.setOrigin(1, 0);
         this.performanceScoreText.depth = 3;
         this.updatePerformance();
 
-        this.performanceScoreChangeText = this.add.text(CONSTANTS.width - 10, 55, "", { fontFamily: "DisplayFont", fontSize: 30, color: "#ffffff", backgroundColor: "#00000044", shadow: { offsetX: 1, offsetY: 1, color: "#66ccff", blur: 4, stroke: true, fill: false } });
+        this.performanceScoreChangeText = this.add.text(CONSTANTS.width - 10, 65, "", { fontFamily: "DisplayFont", fontSize: 30, color: "#ffffff", backgroundColor: "#00000044", shadow: { offsetX: 1, offsetY: 1, color: "#66ccff", blur: 4, stroke: true, fill: false } });
         this.performanceScoreChangeText.setOrigin(1, 0);
         this.performanceScoreChangeText.depth = 3;
         this.performanceScoreChangeNumber = 0;
