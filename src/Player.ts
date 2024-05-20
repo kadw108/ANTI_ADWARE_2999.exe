@@ -11,8 +11,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     canShoot: boolean;
 
     canBeHit: boolean;
-    currentHP: number;
-    maxHP: number;
 
     isAlive: boolean;
 
@@ -42,8 +40,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.canShoot = true;
 
         this.canBeHit = true;
-        this.maxHP = CONSTANTS.maxHP;
-        this.currentHP = this.maxHP;
 
         this.isAlive = false;
 
@@ -104,13 +100,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
             this.setTintFill(0xff0000);
             this.scene.sound.play("sfxHurt");
-
-            this.currentHP--;
-            this.scene.updateHP();
-
-            /* if (this.currentHP <= 0) {
-                this.scene.gameOver();
-            } */
 
             this.scene.time.delayedCall(CONSTANTS.playerHitCooldown, () => {
                 this.clearTint();

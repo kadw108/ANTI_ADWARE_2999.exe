@@ -5,8 +5,6 @@ import { PlayerBullet, PlayerBulletGroup } from "./PlayerBullet";
 
 import { CONSTANTS } from "./CONSTANTS_FILE";
 
-import FishEyePostFx from 'phaser3-rex-plugins/plugins/fisheyepipeline.js';
-
 export default class GameMain extends Phaser.Scene {
     // player: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
     player: Player;
@@ -16,7 +14,6 @@ export default class GameMain extends Phaser.Scene {
 
     rectangleLimit: [number, number, number, number];
 
-    hpText: Phaser.GameObjects.Text;
     performanceScoreText: Phaser.GameObjects.Text;
     performanceScore: number;
     performanceScoreChangeText: Phaser.GameObjects.Text;
@@ -85,11 +82,6 @@ export default class GameMain extends Phaser.Scene {
     }
 
     createText() {
-        this.hpText = this.add.text(10, 20, "", CONSTANTS.textConfig);
-        this.hpText.setOrigin(0, 0);
-        this.hpText.depth = 3;
-        this.updateHP();
-
         this.performanceScore = 0;
         this.performanceScoreText = this.add.text(CONSTANTS.width - 10, 20, "", CONSTANTS.textConfig);
         this.performanceScoreText.setOrigin(1, 0);
@@ -127,13 +119,28 @@ export default class GameMain extends Phaser.Scene {
 
     start(): void {
         this.wearyWillow.play();
+        // this.time.addEvent({delay: 205000, callback: () => {
+        this.time.addEvent({
+            delay: 3050,
+            callback: () => {
+                // this.data.set('performanceScore', this.performanceScore);
+                // this.scene.start("EndScreen", {finalScore: this.performanceScore});
+
+                // from https://phaser.discourse.group/t/global-plugin-with-its-own-data-manager-and-event-emitter/6453
+                // this.game.registry.set('performanceScore', this.performanceScore);
+
+                // @ts-ignore
+                /// this.plugins.get("PassData").performanceScore = this.performanceScore;
+
+                window.idolPerformanceScore = this.performanceScore;
+
+                this.endAll();
+                this.scene.start("EndScreen");
+            },
+        });
+
         this.player.start();
         this.enemyGroupManager.start();
-    }
-
-    updateHP(): void {
-        // this.hpText.text = "HP: " + this.player.currentHP + "/" + this.player.maxHP;
-        this.hpText.text = "";
     }
 
     updatePerformance(): void {
@@ -173,16 +180,18 @@ export default class GameMain extends Phaser.Scene {
         this.enemyGroupManager.updateAll();
     }
 
-    gameOver(): void {
+    endAll(): void {
         this.sound.stopAll();
-        // this.sound.play("gameover");
-
         this.enemyGroupManager.stop();
         this.playerBulletGroup.stop();
         this.player.die();
+    }
 
+    gameOver(): void {
+        this.endAll();
+
+        // this.sound.play("gameover");
         this.gameOverGroup.setVisible(true);
-
         this.input.once("pointerdown", () => {
             this.scene.start("Menu");
         });
