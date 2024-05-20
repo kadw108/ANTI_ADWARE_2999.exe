@@ -91,6 +91,7 @@ export default class GameMain extends Phaser.Scene {
         this.gameOverGroup.setVisible(false);
 
         this.wearyWillow = this.sound.add("wearyWillow", { loop: false, delay: 10 });
+        // this.sound.pauseOnBlur = false;
 
         this.start();
     }
@@ -133,7 +134,10 @@ export default class GameMain extends Phaser.Scene {
             this.performanceScoreChangeText.setColor("#ff2222");
         }
 
-        this.performanceScoreChangeText.text = text.toUpperCase() + ": " + changeModifier + pointChange;
+        const newText = text.toUpperCase() + ": " + changeModifier + pointChange;
+        if (this.performanceScoreChangeText.text !== newText) {
+            this.performanceScoreChangeText.text = newText;
+        }
         this.performanceScore += pointChange;
         this.updatePerformance();
         this.performanceScoreChangeNumber++;

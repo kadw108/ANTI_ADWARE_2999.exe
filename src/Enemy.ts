@@ -436,9 +436,12 @@ export class LetterEnemy extends TextEnemy {
         }
     }
 
-    restart(x: number, y: number, velocity: Phaser.Math.Vector2, fontSize: number, enemyConfig?: EnemyConfig) {
+    restart(x: number, y: number, velocity: Phaser.Math.Vector2, textConfig: TextConfig, enemyConfig?: EnemyConfig) {
         super.start(x, y, velocity, enemyConfig);
-        this.bitmapText.setFontSize(fontSize);
+        this.bitmapText.setFontSize(textConfig.fontSize);
+        if (this.bitmapText.text !== textConfig.text) {
+            this.bitmapText.text = textConfig.text;
+        }
         this.setScale(this.bitmapText.width, this.bitmapText.height);
     }
 

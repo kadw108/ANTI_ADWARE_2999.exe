@@ -300,22 +300,24 @@ export function generateConfig(): Array<ReleaseEvent> {
 
     const START11 = START0 + 378 * BEAT;
     // horizontal 'walls'
-    const diag5 = ["$", "¥"];
+    // const diag5 = ["$", "¥"];
     let skipWhichJ = 0;
     for (let i = 0; i < 31; i++) {
         for (let j = 0; j < 20; j++) {
             if (i % 2 !== 0) {
                 // create moving gap every other line to direct player
                 if (j < skipWhichJ + 7 || j > skipWhichJ + 7) {
-                    config.push({ x: 0 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: START11 + HALF_MEASURE * i - 50, type: "letter", textConfig: { text: diag5[j % 2], fontSize: 70 } });
+                    config.push({ x: 0 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: START11 + HALF_MEASURE * i - 50, type: "letter", textConfig: { text: diag2[j % 2], fontSize: 70 } });
 
-                    // triple to stop player from shooting through
-                    config.push({ x: 0 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: START11 + HALF_MEASURE * i, type: "letter", textConfig: { text: diag5[j % 2], fontSize: 70 } });
+                    // add 3 more layers to stop player from shooting through
+                    config.push({ x: 0 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: START11 + HALF_MEASURE * i, type: "letter", textConfig: { text: diag2[j % 2], fontSize: 70 } });
 
-                    config.push({ x: 0 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: START11 + HALF_MEASURE * i + 50, type: "letter", textConfig: { text: diag5[j % 2], fontSize: 70 } });
+                    config.push({ x: 0 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: START11 + HALF_MEASURE * i + 25, type: "letter", textConfig: { text: diag2[j % 2], fontSize: 70 } });
+
+                    config.push({ x: 0 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: START11 + HALF_MEASURE * i + 50, type: "letter", textConfig: { text: diag2[j % 2], fontSize: 70 } });
                 }
             } else {
-                config.push({ x: 0 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: START11 + HALF_MEASURE * i, type: "letter", textConfig: { text: diag5[j % 2], fontSize: 60 } });
+                config.push({ x: 0 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(0, 200), time: START11 + HALF_MEASURE * i, type: "letter", textConfig: { text: diag2[j % 2], fontSize: 60 } });
             }
         }
 
@@ -342,24 +344,24 @@ export function generateConfig(): Array<ReleaseEvent> {
     const START14 = START0 + 463 * BEAT;
     // blocks of letters - keep this one
     for (let i = 0; i < 13; i++) {
-        for (let j = 0; j < 16; j++) {
+        for (let j = 0; j < 20; j++) {
             if (i % 2 === 0) {
                 config.push({
                     x: CONSTANTS.originX - 95 + (j % 4) * 30,
                     y: -50,
                     velocity: new Phaser.Math.Vector2(0, 200),
-                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 100, // >> 0 for integer division
+                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 80, // >> 0 for integer division
                     type: "letter",
-                    textConfig: { text: diag5[j % 2], fontSize: 58 },
+                    textConfig: { text: diag2[j % 2], fontSize: 58 },
                 });
             } else {
                 config.push({
                     x: CONSTANTS.originX + 30 + (j % 4) * 30,
                     y: -50,
                     velocity: new Phaser.Math.Vector2(0, 200),
-                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 100,
+                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 80,
                     type: "letter",
-                    textConfig: { text: diag5[j % 2], fontSize: 58 },
+                    textConfig: { text: diag2[j % 2], fontSize: 58 },
                 });
             }
         }
@@ -367,7 +369,7 @@ export function generateConfig(): Array<ReleaseEvent> {
 
     // horizontal walls, moving slightly
     const START14b = START0 + 491 * BEAT;
-    const diag6 = ["♡", "✪"];
+    // const diag6 = ["♡", "✪"];
     const MAX_X = 20;
     for (let i = 0; i < 11; i++) {
         // generates pattern 0 1 2 3 4 3 2 1... repeating
@@ -377,7 +379,7 @@ export function generateConfig(): Array<ReleaseEvent> {
         }
 
         for (let j = 0; j < 30; j++) {
-            config.push({ x: -190 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(-MAX_X + (direction * MAX_X) / 2, 200), time: START14b + HALF_MEASURE * i, type: "letter", enemyConfig: { skipCollision: [true, false, true, true] }, textConfig: { text: diag6[j % diag6.length], fontSize: 40 } });
+            config.push({ x: -190 + j * 36, y: -50, velocity: new Phaser.Math.Vector2(-MAX_X + (direction * MAX_X) / 2, 200), time: START14b + HALF_MEASURE * i, type: "letter", enemyConfig: { skipCollision: [true, false, true, true] }, textConfig: { text: diag1[j % diag1.length], fontSize: 40 } });
         }
     }
 

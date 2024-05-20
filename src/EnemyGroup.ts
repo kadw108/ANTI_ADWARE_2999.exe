@@ -147,9 +147,10 @@ class EnemyGroup extends EnemyParent {
 
 class LetterEnemyGroup extends EnemyGroup {
     resurrectOne(x: number, y: number, velocity: Phaser.Math.Vector2, enemyConfig: EnemyConfig | undefined, textConfig: TextConfig, boomerangConfig: BoomerangConfig): boolean {
-        const enemy = this.getChildren().find((child) => !child.active && (child as LetterEnemy).text === textConfig.text);
-        if (enemy !== undefined) {
-            (enemy as LetterEnemy).restart(x, y, velocity, textConfig.fontSize, enemyConfig);
+        // const enemy = this.getChildren().find((child) => !child.active && (child as LetterEnemy).text === textConfig.text);
+        const enemy = this.getFirstDead();
+        if (enemy !== null) {
+            (enemy as LetterEnemy).restart(x, y, velocity, textConfig, enemyConfig);
             return true;
         }
         return false;
