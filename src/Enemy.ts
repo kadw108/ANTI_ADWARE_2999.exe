@@ -18,7 +18,7 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
 
     skipCollision: [boolean, boolean, boolean, boolean]; // whether to skip collision: up down left right
 
-    static emitter: Phaser.GameObjects.Particles.ParticleEmitter | null = null;
+    // static emitter: Phaser.GameObjects.Particles.ParticleEmitter | null = null;
 
     // velocity needed so we can determine which edge the enemy SHOULDN'T be destroyed on collision with.
     constructor(scene: GameMain, type: EnemyType) {
@@ -36,6 +36,7 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
         // leave skipCollision undefined for now
         // this.skipCollision = [true, true, true, true];
 
+        /*
         if (EnemyAbstract.emitter === null) {
             const explodeConfig: Phaser.Types.GameObjects.Particles.ParticleEmitterConfig = {
                 frame: ["squareSmall"],
@@ -55,6 +56,7 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
                 return emitter;
             }
         }
+        */
     }
 
     setHp(hp: number) {
@@ -111,11 +113,12 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
     }
 
     kill() {
-        this.emitDeathParticles();
+        // this.emitDeathParticles();
         this.setActive(false);
         this.setVisible(false);
     }
 
+    /*
     emitDeathParticles() {
         EnemyAbstract.emitter?.emitParticleAt(this.x, this.y, 5);
     }
@@ -124,6 +127,7 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
         EnemyAbstract.emitter?.stop(true);
         EnemyAbstract.emitter = null;
     }
+    */
 
     hit() {
         this.currentHp -= 1;
@@ -439,7 +443,7 @@ export class TextEnemy extends EnemyAbstract {
     }
 
     kill() {
-        this.emitDeathParticles();
+        // this.emitDeathParticles();
         this.bitmapText.destroy();
         this.destroy();
     }
@@ -476,7 +480,7 @@ export class LetterEnemy extends TextEnemy {
     }
 
     kill() {
-        this.emitDeathParticles();
+        // this.emitDeathParticles();
         this.bitmapText.setActive(false);
         this.bitmapText.setVisible(false);
         this.setActive(false);

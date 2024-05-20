@@ -1,39 +1,3 @@
-@keyframes glow {
-    0% {
-        filter: brightness(2);
-    }
-    100% {
-        filter: brightness(1);
-    }
-}
-
-@keyframes blur {
-    0% {
-        filter: blur(0);
-    }
-    100% {
-        filter: blur(4px);
-    }
-}
-
-@keyframes rotatehue {
-    0% {
-        filter: hue-rotate(0);
-    }
-    100% {
-        filter: hue-rotate(360deg);
-    }
-}
-
-@keyframes rotatehuelight {
-    0% {
-        filter: hue-rotate(-40deg);
-    }
-    100% {
-        filter: hue-rotate(40deg);
-    }
-}
-
 @keyframes rotatehueverylight {
     0% {
         filter: hue-rotate(-20deg) saturate(1.1);
@@ -42,6 +6,15 @@
         filter: hue-rotate(20deg) saturate(1.2);
     }
 }
+
+@keyframes slide {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position : 0 300px;
+    }
+  }
 
 @font-face {
     font-family: DisplayFont;
@@ -56,7 +29,6 @@ body, div {
 #fontDiv {
     font-family: "DisplayFont";
     position: absolute;
-    left: 1000%;
     visibility: hidden;
 }
 
@@ -64,9 +36,9 @@ body, div {
     width: 875px;
     height: 750px;
 
-    animation: rotatehueverylight 1s infinite alternate;
+    animation: rotatehueverylight 1s infinite alternate, slide 4s linear infinite;
 
-    border: 7px solid black;
+    border: 11px solid black;
     border-image: url("assets/black1.gif");
     border-color: #222;
     border-image-slice: 8;

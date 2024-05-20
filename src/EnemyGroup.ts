@@ -105,6 +105,7 @@ export class EnemyGroupManager extends EnemyParent {
         return group.resurrectOne(x, y, velocity, enemyConfig, textConfig, boomerangConfig);
     }
 
+    /*
     stop() {
         if (this.getLength() > 0) {
             (this.getChildren()[0] as unknown as EnemyAbstract).killEmitter();
@@ -112,6 +113,7 @@ export class EnemyGroupManager extends EnemyParent {
 
         this.clear(true, true);
     }
+    */
 }
 
 class EnemyGroup extends EnemyParent {
