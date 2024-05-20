@@ -15,7 +15,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     isAlive: boolean;
 
     constructor(scene: GameMain) {
-        super(scene, 450, 550, "atlas1", "player.png");
+        super(scene, CONSTANTS.originX, CONSTANTS.originY + 200, "atlas1", "player.png");
         // super(scene, 450, 550, "circle");
         /* this.scale = 0.24; // sprite = circle w radius 13 */
 

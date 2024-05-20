@@ -1,11 +1,17 @@
 import { CONSTANTS } from "./CONSTANTS_FILE";
 
 export default class Menu extends Phaser.Scene {
+
+    posthuman: Phaser.Sound.NoAudioSound | Phaser.Sound.WebAudioSound | Phaser.Sound.HTML5AudioSound;
+
     constructor() {
         super("Menu");
     }
 
     create(): void {
+        this.posthuman = this.sound.add("posthuman", { loop: true, delay: 0 });
+        this.posthuman.play();
+
         const title = this.add.text(CONSTANTS.originX, CONSTANTS.originY - 30, "ANTI_ADWARE_2999.EXE", { fontFamily: "DisplayFont", fontSize: 70, color: "#ffffff" });
         title.setOrigin(0.5, 0.5);
 
@@ -23,6 +29,7 @@ export default class Menu extends Phaser.Scene {
         subtitle.setOrigin(0.5, 0.5);
         subtitle.setInteractive();
         subtitle.on("pointerdown", () => {
+            this.posthuman.destroy();
             this.scene.start("GameMain");
         });
 
