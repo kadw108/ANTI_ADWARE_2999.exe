@@ -23,11 +23,7 @@ export class PlayerBulletGroup extends Phaser.Physics.Arcade.Group {
     }
 
     stop() {
-        // this.timedEvent.remove();
-
-        this.getChildren().forEach((child) => {
-            (child as PlayerBullet).kill();
-        });
+        this.clear(true, true);
     }
 }
 

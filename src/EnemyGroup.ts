@@ -46,9 +46,7 @@ class EnemyParent extends Phaser.Physics.Arcade.Group {
     }
 
     stop() {
-        this.getChildren().forEach((child) => {
-            (child as unknown as EnemyAbstract).kill();
-        });
+        this.clear(true, true);
     }
 
     updateAll() {
@@ -108,18 +106,11 @@ export class EnemyGroupManager extends EnemyParent {
     }
 
     stop() {
-        const children = this.getChildren();
-        for (let i = 0; i < children.length; i++) {
-            if (i === 0) {
-                (children[i] as unknown as EnemyAbstract).killEmitter();
-            }
-
-            (children[i] as unknown as EnemyAbstract).kill();
+        if (this.getLength() > 0) {
+            (this.getChildren()[0] as unknown as EnemyAbstract).killEmitter();
         }
 
-        this.getChildren().forEach((child) => {
-            (child as unknown as EnemyAbstract).kill();
-        });
+        this.clear(true, true);
     }
 }
 

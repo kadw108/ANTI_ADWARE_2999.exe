@@ -44,9 +44,16 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
                 scale: { min: 1, max: 3 },
                 // blendMode: "ADD",
                 emitting: false,
+                maxAliveParticles: 120
             };
 
             EnemyAbstract.emitter = scene.add.particles(0, 0, "squareSmall", explodeConfig);
+            EnemyAbstract.emitter.onParticleEmit = (particle, emitter) => {
+                if (emitter.atLimit()) {
+                    emitter.killAll();
+                }
+                return emitter;
+            }
         }
     }
 
@@ -110,12 +117,11 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
     }
 
     emitDeathParticles() {
-        EnemyAbstract.emitter?.emitParticleAt(this.x, this.y, 6);
+        EnemyAbstract.emitter?.emitParticleAt(this.x, this.y, 5);
     }
 
     killEmitter() {
-        EnemyAbstract.emitter?.stop();
-        EnemyAbstract.emitter?.killAll();
+        EnemyAbstract.emitter?.stop(true);
         EnemyAbstract.emitter = null;
     }
 
