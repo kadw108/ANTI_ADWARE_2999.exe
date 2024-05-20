@@ -14,7 +14,7 @@ const configObject: Phaser.Types.Core.GameConfig = {
     scale: {
         mode: Phaser.Scale.NONE,
         zoom: 1.25,
-        autoCenter: Phaser.Scale.CENTER_BOTH,
+        autoCenter: Phaser.Scale.NO_CENTER,
         parent: "thegame",
         width: CONSTANTS.width,
         height: CONSTANTS.height,
@@ -23,6 +23,7 @@ const configObject: Phaser.Types.Core.GameConfig = {
     physics: {
         default: "arcade",
     },
+    transparent: true
 
     // type: Phaser.WEBGL,
     // @ts-ignore, see https://github.com/phaserjs/examples/blob/master/public/src/renderer/grayscale%20pipeline.js

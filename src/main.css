@@ -49,6 +49,28 @@
     font-weight: normal;
 }
 
-body {
+body, div {
+    margin: 0;
+}
+
+#fontDiv {
+    font-family: "DisplayFont";
+    position: absolute;
+    left: 1000%;
+    visibility: hidden;
+}
+
+#thegame {
+    width: 875px;
+    height: 750px;
+
     animation: rotatehueverylight 1s infinite alternate;
+
+    border: 7px solid black;
+    border-image: url("assets/black1.gif");
+    border-color: #222;
+    border-image-slice: 8;
+    border-image-repeat: repeat;
+
+    background-image: url("assets/bg4.gif");
 }

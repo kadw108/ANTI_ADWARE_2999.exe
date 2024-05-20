@@ -37,6 +37,7 @@ export default class GameMain extends Phaser.Scene {
         const rectangle = this.add.rectangle(...this.rectangleLimit);
         rectangle.isStroked = true;
         rectangle.strokeColor = 0xffffff;
+        rectangle.setFillStyle(0x000000, 0.6);
 
         const boundsRect = new Phaser.Geom.Rectangle(...this.rectangleLimit);
         boundsRect.setPosition(this.rectangleLimit[0] - this.rectangleLimit[2] / 2, this.rectangleLimit[1] - this.rectangleLimit[3] / 2);
@@ -120,7 +121,7 @@ export default class GameMain extends Phaser.Scene {
     start(): void {
         this.wearyWillow.play();
         this.time.addEvent({
-            delay: 195000,
+            delay: 193000,
             callback: () => {
                 // this.data.set('performanceScore', this.performanceScore);
                 // this.scene.start("EndScreen", {finalScore: this.performanceScore});
