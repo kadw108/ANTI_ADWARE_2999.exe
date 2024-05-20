@@ -5,6 +5,9 @@ import { PlayerBullet, PlayerBulletGroup } from "./PlayerBullet";
 
 import { CONSTANTS } from "./CONSTANTS_FILE";
 
+import GameShader from "./ShaderGray";
+// import GrayScalePipeline from "./ShaderGray2";
+
 export default class GameMain extends Phaser.Scene {
     // player: Phaser.Types.Physics.Arcade.ImageWithDynamicBody;
     player: Player;
@@ -64,6 +67,18 @@ export default class GameMain extends Phaser.Scene {
             this.playerBulletHitEnemy(bullet as PlayerBullet, enemy as EnemyAbstract);
         });
 
+        this.createText();
+
+        this.wearyWillow = this.sound.add("wearyWillow", { loop: false, delay: 10 });
+        // this.sound.pauseOnBlur = false;
+
+        let cam = this.cameras.main;
+        cam.setPostPipeline(GameShader);
+
+        this.start();
+    }
+
+    createText() {
         this.hpText = this.add.text(10, 20, "", { fontFamily: "DisplayFont", fontSize: 40, color: "#ffffff", backgroundColor: "#00000044", stroke: "#203c5b", strokeThickness: 6, shadow: { offsetX: 2, offsetY: 2, color: "#66ccff", blur: 4, stroke: true, fill: false } });
         this.hpText.setOrigin(0, 0);
         this.hpText.depth = 3;
@@ -89,11 +104,6 @@ export default class GameMain extends Phaser.Scene {
         subtitle.setOrigin(0.5, 0.5);
         this.gameOverGroup = this.add.group([gameOverRect, gameOverText, subtitle]);
         this.gameOverGroup.setVisible(false);
-
-        this.wearyWillow = this.sound.add("wearyWillow", { loop: false, delay: 10 });
-        // this.sound.pauseOnBlur = false;
-
-        this.start();
     }
 
     playerHitEnemy(player: Player, enemy: EnemyAbstract) {
@@ -129,8 +139,7 @@ export default class GameMain extends Phaser.Scene {
         if (pointChange > 0) {
             changeModifier = "+";
             this.performanceScoreChangeText.setColor("#22ff22");
-        }
-        else if (pointChange < 0) {
+        } else if (pointChange < 0) {
             this.performanceScoreChangeText.setColor("#ff2222");
         }
 

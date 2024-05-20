@@ -36,10 +36,10 @@
 
 @keyframes rotatehueverylight {
     0% {
-        filter: hue-rotate(-20deg);
+        filter: hue-rotate(-20deg) saturate(1.1);
     }
     100% {
-        filter: hue-rotate(20deg);
+        filter: hue-rotate(20deg) saturate(1.2);
     }
 }
 
