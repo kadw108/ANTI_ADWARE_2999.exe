@@ -74,7 +74,7 @@ export class EnemyGroupManager extends EnemyParent {
             blocky: new EnemyGroup(scene,
                 { width: CONSTANTS.width, height: 9, hp: -1 },
                 BlockyEnemy),
-            letter: new EnemyGroup(scene,
+            letter: new LetterEnemyGroup(scene,
                 { width: -1, height: -1, hp: 1, text: true },
                 LetterEnemy),
             boomerang: new EnemyGroup(scene,
@@ -138,7 +138,18 @@ class EnemyGroup extends EnemyParent {
     resurrectOne(x: number, y: number, velocity: Phaser.Math.Vector2, enemyConfig: EnemyConfig | undefined, textConfig: TextConfig, boomerangConfig: BoomerangConfig): boolean {
         const enemy = this.getFirstDead();
         if (enemy !== null) {
-            enemy.start(x, y, velocity, enemyConfig, textConfig, boomerangConfig);
+            enemy.start(x, y, velocity, enemyConfig, boomerangConfig);
+            return true;
+        }
+        return false;
+    }
+}
+
+class LetterEnemyGroup extends EnemyGroup {
+    resurrectOne(x: number, y: number, velocity: Phaser.Math.Vector2, enemyConfig: EnemyConfig | undefined, textConfig: TextConfig, boomerangConfig: BoomerangConfig): boolean {
+        const enemy = this.getChildren().find((child) => !child.active && (child as LetterEnemy).text === textConfig.text);
+        if (enemy !== undefined) {
+            (enemy as LetterEnemy).restart(x, y, velocity, textConfig.fontSize, enemyConfig);
             return true;
         }
         return false;
