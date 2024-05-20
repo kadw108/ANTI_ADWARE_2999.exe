@@ -117,6 +117,22 @@ export class EnemyGroupManager extends EnemyParent {
         const group = this.typeList[enemyTypeKey];
         return group.resurrectOne(x, y, velocity, enemyConfig, textConfig, boomerangConfig);
     }
+
+    stop() {
+        const children = this.getChildren();
+        for (let i = 0; i < children.length; i++) {
+            if (i === 0) {
+                (children[i] as unknown as EnemyAbstract).killEmitter();
+            }
+            
+            (children[i] as unknown as EnemyAbstract).kill();
+        }
+
+        this.getChildren().forEach((child) => {
+            (child as unknown as EnemyAbstract).kill();
+        });
+    }
+
 }
 
 class EnemyGroup extends EnemyParent {

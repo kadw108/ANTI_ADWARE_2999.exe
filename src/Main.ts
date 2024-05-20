@@ -6,8 +6,6 @@ import GameMain from "./Game";
 import Menu from "./Menu";
 import EndScreen from "./EndScreen";
 
-import { PassData } from "./PassData";
-
 import { CONSTANTS } from "./CONSTANTS_FILE";
 
 // import GameShader from "./ShaderGray";
@@ -25,16 +23,6 @@ const configObject: Phaser.Types.Core.GameConfig = {
     scene: [Boot, Preloader, Menu, GameMain, EndScreen],
     physics: {
         default: "arcade",
-    },
-
-    plugins: {
-        global: [
-            //make the Player global to all scenes (and other plugins)
-            // key is plugin key, plugin is class, start true/false if there
-            // is a start method to run, mapping is the name tagged of this
-            // to access the plugin class
-            { key: "PassData", plugin: PassData, start: false, mapping: "PassData" },
-        ],
     },
 
     // type: Phaser.WEBGL,

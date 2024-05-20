@@ -8,7 +8,7 @@ export default class Preloader extends Phaser.Scene {
     }
 
     preload() {
-        this.loadText = this.add.text(CONSTANTS.originX, CONSTANTS.originY, "Loading ...", { fontFamily: "DisplayFont", fontSize: 74, color: "#e3f2ed" });
+        this.loadText = this.add.text(CONSTANTS.originX, CONSTANTS.originY, "Loading ...", CONSTANTS.textConfig);
         this.loadText.setOrigin(0.5);
         this.loadText.setStroke("#203c5b", 6);
         this.loadText.setShadow(2, 2, "#2d2d2d", 4, true, false);
@@ -60,7 +60,7 @@ export default class Preloader extends Phaser.Scene {
         });
 
         if (this.sound.locked) {
-            this.loadText.setText("Click to Start");
+            this.loadText.setText("Loading Done!\nClick to Start.");
 
             this.input.once("pointerdown", () => {
                 this.scene.start("Menu");
