@@ -18,6 +18,8 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
 
     skipCollision: [boolean, boolean, boolean, boolean]; // whether to skip collision: up down left right
 
+    static emitter: Phaser.GameObjects.Particles.ParticleEmitter | null = null;
+
     // velocity needed so we can determine which edge the enemy SHOULDN'T be destroyed on collision with.
     constructor(scene: GameMain, type: EnemyType) {
         super(scene, 0, 0, "squareSmall");
@@ -33,6 +35,19 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
 
         // leave skipCollision undefined for now
         // this.skipCollision = [true, true, true, true];
+
+        if (EnemyAbstract.emitter === null) {
+            const explodeConfig: Phaser.Types.GameObjects.Particles.ParticleEmitterConfig = {
+                frame: ["squareSmall"],
+                lifespan: 200,
+                speed: { min: 150, max: 350 },
+                scale: { min: 1, max: 3 },
+                // blendMode: "ADD",
+                emitting: false,
+            };
+
+            EnemyAbstract.emitter = scene.add.particles(0, 0, "squareSmall", explodeConfig);
+        }
     }
 
     setHp(hp: number) {
@@ -79,8 +94,7 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
 
             if (enemyConfig !== undefined && enemyConfig.skipCollision !== undefined) {
                 this.skipCollision = enemyConfig.skipCollision;
-            }
-            else {
+            } else {
                 this.skipCollision = [initialVelocity.y > 0, initialVelocity.y < 0, initialVelocity.x > 0, initialVelocity.x > 0];
             }
         }
@@ -90,8 +104,13 @@ export abstract class EnemyAbstract extends Phaser.Physics.Arcade.Sprite {
     }
 
     kill() {
+        this.emitDeathParticles();
         this.setActive(false);
         this.setVisible(false);
+    }
+
+    emitDeathParticles() {
+        EnemyAbstract.emitter?.emitParticleAt(this.x, this.y, 10);
     }
 
     hit() {
@@ -160,9 +179,8 @@ export class Enemy extends EnemyAbstract {
         super(scene, type);
     }
 
-    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig, boomerangConfig? :BoomerangConfig) {
+    start(x: number, y: number, initialVelocity?: Phaser.Math.Vector2, enemyConfig?: EnemyConfig, boomerangConfig?: BoomerangConfig) {
         super.start(x, y, initialVelocity, enemyConfig);
-
 
         this.scaleX = this.enemyType.width;
         this.scaleY = this.enemyType.height;
@@ -186,8 +204,7 @@ export class LineEnemy extends EnemyAbstract {
         // I don't know why?
         if (enemyConfig !== undefined && enemyConfig.width !== undefined && enemyConfig.height !== undefined) {
             this.dynamicBody.setSize(enemyConfig.width, enemyConfig.height);
-        }
-        else {
+        } else {
             // don't want to set scale because that affects image/anim size, so just
             // set size of body
             this.dynamicBody.setSize(this.enemyType.width, this.enemyType.height);
@@ -251,7 +268,7 @@ export class CircleEnemy extends EnemyAbstract {
         if (enemyConfig !== undefined && enemyConfig.width !== undefined) {
             newWidth = enemyConfig.width;
         }
-        this.setCircle(newWidth/2);
+        this.setCircle(newWidth / 2);
     }
 }
 
@@ -286,14 +303,14 @@ export class BoomerangEnemy extends EnemyAbstract {
         if (enemyConfig !== undefined && enemyConfig.width !== undefined) {
             newWidth = enemyConfig.width;
         }
-        if (newWidth > 60) { // hardcoded; possible TODO - improve?
+        if (newWidth > 60) {
+            // hardcoded; possible TODO - improve?
             this.play("boomerangBig");
-        }
-        else {
+        } else {
             this.stop();
             this.setTexture("atlas1", "boomerangSmall.png");
         }
-        this.setCircle(newWidth/2);
+        this.setCircle(newWidth / 2);
 
         let newVelocity: Phaser.Math.Vector2;
         if (boomerangConfig.newVelocity === undefined) {
@@ -410,6 +427,7 @@ export class TextEnemy extends EnemyAbstract {
     }
 
     kill() {
+        this.emitDeathParticles();
         this.bitmapText.destroy();
         this.destroy();
     }
@@ -446,6 +464,7 @@ export class LetterEnemy extends TextEnemy {
     }
 
     kill() {
+        this.emitDeathParticles();
         this.bitmapText.setActive(false);
         this.bitmapText.setVisible(false);
         this.setActive(false);

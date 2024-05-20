@@ -21,10 +21,9 @@ export default class Preloader extends Phaser.Scene {
 
         this.load.bitmapFont("DisplayFont", "assets/VT323Bitmap.png", "assets/VT323Bitmap.xml");
 
-        this.load.image("circle", "assets/circle.png");
-        this.load.image("square", "assets/square.png");
+        // this.load.image("circle", "assets/circle.png");
         this.load.image("squareSmall", "assets/squareSmall.png");
-
+        // this.load.image("square", "assets/square.png");
         this.load.atlas("atlas1", "assets/texture.png", "assets/texture.json");
 
         /*
