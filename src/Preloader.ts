@@ -8,22 +8,23 @@ export default class Preloader extends Phaser.Scene {
     }
 
     preload() {
-        this.loadText = this.add.text(CONSTANTS.originX, CONSTANTS.originY, "Loading ...", CONSTANTS.textConfig);
+        this.loadText = this.add.text(CONSTANTS.originX, CONSTANTS.originY, "LOADING", CONSTANTS.textConfig);
+        // this.loadText.setFont("DisplayFont");
         this.loadText.setOrigin(0.5);
         this.loadText.setStroke("#203c5b", 6);
         this.loadText.setShadow(2, 2, "#2d2d2d", 4, true, false);
 
-        this.load.audio("sfxDestroy", ["assets/sfx_destroy.wav"]);
-        this.load.audio("sfxDestroy2", ["assets/sfx_destroy2.wav"]);
-        this.load.audio("sfxFire", ["assets/sfx_fire.wav"]);
-        this.load.audio("sfxHurt", ["assets/sfx_hurt.wav"]);
-        this.load.audio("wearyWillow", ["assets/wearyWillow.ogg", "assets/wearyWillow.mp3"]);
-        this.load.audio("posthuman", ["assets/posthuman.ogg", "assets/posthuman.mp3"]);
+        this.load.audio("sfxDestroy", ["./assets/sfx_destroy.wav"]);
+        this.load.audio("sfxDestroy2", ["./assets/sfx_destroy2.wav"]);
+        this.load.audio("sfxFire", ["./assets/sfx_fire.wav"]);
+        this.load.audio("sfxHurt", ["./assets/sfx_hurt.wav"]);
+        this.load.audio("wearyWillow", ["./assets/wearyWillow.ogg", "./assets/wearyWillow.mp3"]);
+        this.load.audio("posthuman", ["./assets/posthuman.ogg", "./assets/posthuman.mp3"]);
 
-        this.load.bitmapFont("DisplayFont", "assets/VT323Bitmap.png", "assets/VT323Bitmap.xml");
+        this.load.bitmapFont("DisplayFont", "./assets/VT323Bitmap.png", "./assets/VT323Bitmap.xml");
 
-        this.load.image("squareSmall", "assets/squareSmall.png");
-        this.load.atlas("atlas1", "assets/texture.png", "assets/texture.json");
+        this.load.image("squareSmall", "./assets/squareSmall.png");
+        this.load.atlas("atlas1", "./assets/texture.png", "./assets/texture.json");
     }
 
     create() {
