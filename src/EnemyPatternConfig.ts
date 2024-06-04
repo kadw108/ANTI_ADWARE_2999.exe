@@ -57,6 +57,7 @@ function generateDisco(startTime: number, stayTime: number): Array<ReleaseEvent>
         velocity: new Phaser.Math.Vector2(0, 350),
         time: startTime,
         type: "boomerang",
+        enemyConfig: {hp: -1},
         boomerangConfig: { stayTime: stayTime, reverseTime: HALF_MEASURE * 15 },
     });
     for (let i = 0; i < 10; i++) {
@@ -332,8 +333,11 @@ export function generateConfig(): Array<ReleaseEvent> {
     }
 
     const START12 = START11 + MEASURE * 2;
-    for (const event of generateLines(START12, MEASURE * 2, 6, "blocky", "left")) {
-        config.push(event);
+    const lines = generateLines(START12, MEASURE * 2, 7, "blocky", "left");
+    for (let i = 0; i < lines.length; i++) {
+        if (i !== 2 && i !== 3 && i !== 4) {
+            config.push(lines[i]);
+        }
     }
 
     const START13 = START0 + 439 * BEAT;
@@ -350,7 +354,7 @@ export function generateConfig(): Array<ReleaseEvent> {
                     x: CONSTANTS.originX - 95 + (j % 4) * 30,
                     y: -50,
                     velocity: new Phaser.Math.Vector2(0, 200),
-                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 80, // >> 0 for integer division
+                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 65, // >> 0 for integer division
                     type: "letter",
                     textConfig: { text: diag2[j % 2], fontSize: 58 },
                 });
@@ -359,7 +363,7 @@ export function generateConfig(): Array<ReleaseEvent> {
                     x: CONSTANTS.originX + 30 + (j % 4) * 30,
                     y: -50,
                     velocity: new Phaser.Math.Vector2(0, 200),
-                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 80,
+                    time: START14 + HALF_MEASURE * i + ((j / 4) >> 0) * 65,
                     type: "letter",
                     textConfig: { text: diag2[j % 2], fontSize: 58 },
                 });

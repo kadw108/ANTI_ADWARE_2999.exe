@@ -21,7 +21,7 @@ export default class EndScreen extends Phaser.Scene {
         title.setOrigin(0.5, 0.5);
         title.setFontSize(70);
 
-        const subtitle = this.add.text(CONSTANTS.originX, CONSTANTS.originY + 100, "FINAL SCORE: " + this.performanceScore, CONSTANTS.textConfig);
+        const subtitle = this.add.text(CONSTANTS.originX, CONSTANTS.originY + 100, "TIMES HIT: " + -this.performanceScore, CONSTANTS.textConfig);
         subtitle.setOrigin(0.5, 0.5);
 
         const subtitle2 = this.add.text(CONSTANTS.originX, CONSTANTS.originY + 150, "Click to play again!", CONSTANTS.textConfig);

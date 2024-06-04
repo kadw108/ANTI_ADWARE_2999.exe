@@ -31,7 +31,7 @@ export const CONSTANTS: constants = {
     enemySpeed: 200,
     bulletSpeed: 250,
 
-    playerHitPointLoss: -15,
+    playerHitPointLoss: -1,
     playerFirePointLoss: -1,
     playerHitEnemyPointGain: 3,
 

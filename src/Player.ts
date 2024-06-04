@@ -29,7 +29,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
         // physics body is always positioned from the top-left of the game object
         // hardcoded value from looking at image
-        this.dynamicBody.setCircle(7.5, 4, 4);
+        this.dynamicBody.setCircle(3, 7.5, 7.5);
 
         this.dynamicBody.setCollideWorldBounds(true, 0, 0);
         this.dynamicBody.setImmovable(true);

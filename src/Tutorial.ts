@@ -6,7 +6,7 @@ export default class Tutorial extends Phaser.Scene {
     }
 
     create(): void {
-        const lines = this.add.text(CONSTANTS.originX, 10, "Thank you for CYBERLINKING into ANTI_ADWARE_2999.EXE!\nJUSTISCO CORPORATION [TM] appreciates your dedication\nto combating MALEVOLENT INTERNET ENTITIES.\n\nWetware interface instructions:\n* Arrow keys to move.\n* Space to shoot.\n* Maximize performance.", { fontFamily: "DisplayFont", fontSize: 30, color: "#ffffff" });
+        const lines = this.add.text(CONSTANTS.originX, 10, "MALEVOLENT INTERNET ENTITIES are trying to damage your cyberware.\n Don't get hit!\n\nBrainlink interface instructions:\n* Arrow keys to move.\n* Space to shoot.\n* Minimize damage.", { fontFamily: "DisplayFont", fontSize: 30, color: "#ffffff" });
         lines.setOrigin(0.5, 0);
 
         const wavy = this.add.sprite(CONSTANTS.originX, CONSTANTS.originY - 20, "atlas", "wavy1.png");

@@ -86,6 +86,7 @@ export default class GameMain extends Phaser.Scene {
         this.performanceScore = 0;
         this.performanceScoreText = this.add.text(CONSTANTS.width - 10, 20, "", CONSTANTS.textConfig);
         this.performanceScoreText.setOrigin(1, 0);
+        this.performanceScoreText.setColor("#22ff22");
         this.performanceScoreText.depth = 3;
         this.updatePerformance();
 
@@ -114,7 +115,7 @@ export default class GameMain extends Phaser.Scene {
         if (bullet.active && enemy.active && enemy.canHit) {
             bullet.kill();
             enemy.hit();
-            this.changePerformanceEvent("Hit Enemy", CONSTANTS.playerHitEnemyPointGain);
+            // this.changePerformanceEvent("Hit Enemy", CONSTANTS.playerHitEnemyPointGain);
         }
     }
 
@@ -144,7 +145,11 @@ export default class GameMain extends Phaser.Scene {
     }
 
     updatePerformance(): void {
-        this.performanceScoreText.text = "Performance: " + this.performanceScore;
+        this.performanceScoreText.text = "Times Hit: " + -this.performanceScore;
+
+        if (this.performanceScore < 0) {
+            this.performanceScoreText.setColor("#ff2222");
+        }
     }
 
     changePerformanceEvent(text: string, pointChange: number): void {
