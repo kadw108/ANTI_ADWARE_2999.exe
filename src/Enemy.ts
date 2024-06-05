@@ -251,7 +251,7 @@ export class WavyEnemy extends LineEnemy {
     }
 
     onHitPlayer(player: Player): void {
-        if (player.dynamicBody.speed === 0) {
+        if (player.dynamicBody.deltaXFinal() === 0 && player.dynamicBody.deltaYFinal() === 0) {
             player.hit();
         }
     }
@@ -264,7 +264,7 @@ export class BlockyEnemy extends LineEnemy {
     }
 
     onHitPlayer(player: Player): void {
-        if (player.dynamicBody.speed !== 0) {
+        if (player.dynamicBody.deltaXFinal() !== 0 || player.dynamicBody.deltaYFinal() !== 0) {
             player.hit();
         }
     }
