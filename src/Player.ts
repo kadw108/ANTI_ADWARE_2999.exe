@@ -5,7 +5,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     scene: GameMain;
 
     cursors: Phaser.Types.Input.Keyboard.CursorKeys;
-    spacebar: Phaser.Input.Keyboard.Key;
     dynamicBody: Phaser.Physics.Arcade.Body;
 
     canShoot: boolean;
@@ -35,7 +34,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.dynamicBody.setImmovable(true);
 
         this.cursors = scene.input.keyboard!.createCursorKeys();
-        this.spacebar = this.scene.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        this.scene.input.keyboard!.on('keydown-SPACE', () => {
+            this.fire();
+        });
 
         this.canShoot = true;
 
@@ -52,17 +53,17 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     moveHorizontal() {
         if (this.cursors.left.isDown) {
-            this.dynamicBody!.setVelocityX(-CONSTANTS.playerSpeed);
+            this.dynamicBody.setVelocityX(-CONSTANTS.playerSpeed);
         } else if (this.cursors.right.isDown) {
-            this.dynamicBody!.setVelocityX(CONSTANTS.playerSpeed);
+            this.dynamicBody.setVelocityX(CONSTANTS.playerSpeed);
         } else {
-            this.dynamicBody!.setVelocityX(0);
+            this.dynamicBody.setVelocityX(0);
         }
     }
 
     moveVertical() {
         if (this.cursors.up.isDown) {
-            this.dynamicBody!.setVelocityY(-CONSTANTS.playerSpeed);
+            this.dynamicBody.setVelocityY(-CONSTANTS.playerSpeed);
         } else if (this.cursors.down.isDown) {
             this.dynamicBody.setVelocityY(CONSTANTS.playerSpeed);
         } else {
@@ -71,8 +72,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     }
 
     fire() {
-        // if (this.cursors.space.isDown && this.canShoot) {
-        if (this.cursors.space.isDown && this.canShoot) {
+        if (this.canShoot) {
             this.canShoot = false;
 
             this.scene.playerBulletGroup.fireBullet(this.x, this.y - 5);
@@ -88,7 +88,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         if (this.isAlive) {
             this.moveHorizontal();
             this.moveVertical();
-            this.fire();
         }
     }
 

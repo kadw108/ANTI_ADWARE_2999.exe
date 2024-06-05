@@ -22,6 +22,9 @@ export default class Menu extends Phaser.Scene {
         const byline = this.add.text(CONSTANTS.originX, CONSTANTS.originY + 30, "By KADW", { fontFamily: "DisplayFont", fontSize: 40, color: "#ffffff"});
         byline.setOrigin(0.5, 0.5);
 
+        const version = this.add.text(CONSTANTS.originX, CONSTANTS.originY + 80, "Post-Jam Version", { fontFamily: "DisplayFont", fontSize: 26, color: "#ffffff"});
+        version.setOrigin(0.5, 0.5);
+
         const tutorial = this.add.text(CONSTANTS.originX, CONSTANTS.originY + 140, " INSTRUCTIONS ", { fontFamily: "DisplayFont", fontSize: 40, color: "#ffffff", backgroundColor: "#2244ff" });
         tutorial.setOrigin(0.5, 0.5);
         tutorial.setInteractive();

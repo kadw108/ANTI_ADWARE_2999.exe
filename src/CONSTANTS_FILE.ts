@@ -35,9 +35,9 @@ export const CONSTANTS: constants = {
     playerFirePointLoss: -1,
     playerHitEnemyPointGain: 3,
 
-    playerShootCooldown: 500,
-    playerHitCooldown: 700,
-    playerSpeed: 130,
+    playerShootCooldown: 425,
+    playerHitCooldown: 800,
+    playerSpeed: 145,
     maxHP: 9999,
 
     textConfig: { fontFamily: "DisplayFont", fontSize: 40, color: "#ffffff", backgroundColor: "#00000044", stroke: "#203c5b", strokeThickness: 6, shadow: { offsetX: 2, offsetY: 2, color: "#66ccff", blur: 4, stroke: true, fill: false } },

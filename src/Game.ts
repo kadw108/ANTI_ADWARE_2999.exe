@@ -161,7 +161,8 @@ export default class GameMain extends Phaser.Scene {
             this.performanceScoreChangeText.setColor("#ff2222");
         }
 
-        const newText = text.toUpperCase() + ": " + changeModifier + pointChange;
+        // const newText = text.toUpperCase() + ": " + changeModifier + pointChange;
+        const newText = text.toUpperCase();
         if (this.performanceScoreChangeText.text !== newText) {
             this.performanceScoreChangeText.text = newText;
         }

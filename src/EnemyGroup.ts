@@ -57,13 +57,13 @@ class EnemyParent extends Phaser.Physics.Arcade.Group {
 }
 
 export class EnemyGroupManager extends EnemyParent {
-    static config: Array<ReleaseEvent> = generateConfig();
-
+    config: Array<ReleaseEvent>;
     typeList: { [id: string]: EnemyGroup };
 
     constructor(scene: GameMain) {
         super(scene.physics.world, scene);
 
+        this.config = generateConfig();
         this.typeList = {
             wavy: new EnemyGroup(scene, { width: CONSTANTS.width, height: 9, hp: -1 }, WavyEnemy),
             blocky: new EnemyGroup(scene, { width: CONSTANTS.width, height: 9, hp: -1 }, BlockyEnemy),
@@ -74,7 +74,7 @@ export class EnemyGroupManager extends EnemyParent {
     }
 
     start() {
-        for (const releaseEvent of EnemyGroupManager.config) {
+        for (const releaseEvent of this.config) {
             this.scene.time.addEvent({
                 delay: releaseEvent.time,
                 callback: () => {

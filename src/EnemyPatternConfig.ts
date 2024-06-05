@@ -284,8 +284,8 @@ export function generateConfig(): Array<ReleaseEvent> {
         }
     }
 
-    const START8 = START0 + 288 * BEAT;
-    for (const event of generateLines(START8, MEASURE * 2, 5, "blocky", "left")) {
+    const START8 = START0 + 288 * BEAT + MEASURE * 2;
+    for (const event of generateLines(START8, MEASURE * 2, 4, "blocky", "left")) {
         config.push(event);
     }
 
