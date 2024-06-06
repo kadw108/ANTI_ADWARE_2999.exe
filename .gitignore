@@ -1,4 +1,4 @@
 node_modules
-dist/*
+dist/assets/wearyWillow*
 src/unused
 todo.md
