@@ -1,6 +1,6 @@
 ## [Play in Browser Here](https://kanderwund.itch.io/adware2999)
 
-The final game and its assets* are in the `dist` folder, but you'll need to start a local server to play it, if you don't want to play the browser version.
+The final game and its assets* are in the `dist` folder, but you'll need to start a local server to play it, if you don't want to play the browser version. Also, since the main song is missing, I would just recommend the browser version.
 
 *Excluding the song Weary Willow, which does not belong to me and has more specific licensing requirements (see [here](https://msx.horse/res.php)).
 
